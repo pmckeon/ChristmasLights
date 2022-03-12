@@ -1,0 +1,1152 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 4.0.0 #11528 (MINGW64)
+                              4 ;--------------------------------------------------------
+                              5 	.module PSGLib
+                              6 	.optsdcc -mz80
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _PSGSFXSubstringRetAddr
+                             12 	.globl _PSGSFXSubstringLen
+                             13 	.globl _PSGSFXLoopFlag
+                             14 	.globl _PSGSFXSkipFrames
+                             15 	.globl _PSGSFXLoopPoint
+                             16 	.globl _PSGSFXPointer
+                             17 	.globl _PSGSFXStart
+                             18 	.globl _PSGSFXStatus
+                             19 	.globl _PSGSFXChan3Volume
+                             20 	.globl _PSGSFXChan2Volume
+                             21 	.globl _PSGChannel3SFX
+                             22 	.globl _PSGChannel2SFX
+                             23 	.globl _PSGChan3LowTone
+                             24 	.globl _PSGChan2HighTone
+                             25 	.globl _PSGChan2LowTone
+                             26 	.globl _PSGChan3Volume
+                             27 	.globl _PSGChan2Volume
+                             28 	.globl _PSGChan1Volume
+                             29 	.globl _PSGChan0Volume
+                             30 	.globl _PSGMusicSubstringRetAddr
+                             31 	.globl _PSGMusicSubstringLen
+                             32 	.globl _PSGMusicVolumeAttenuation
+                             33 	.globl _PSGMusicLastLatch
+                             34 	.globl _PSGLoopFlag
+                             35 	.globl _PSGMusicSkipFrames
+                             36 	.globl _PSGMusicLoopPoint
+                             37 	.globl _PSGMusicPointer
+                             38 	.globl _PSGMusicStart
+                             39 	.globl _PSGMusicStatus
+                             40 	.globl _PSGStop
+                             41 	.globl _PSGResume
+                             42 	.globl _PSGPlay
+                             43 	.globl _PSGCancelLoop
+                             44 	.globl _PSGPlayNoRepeat
+                             45 	.globl _PSGGetStatus
+                             46 	.globl _PSGSilenceChannels
+                             47 	.globl _PSGRestoreVolumes
+                             48 	.globl _PSGSetMusicVolumeAttenuation
+                             49 	.globl _PSGSFXStop
+                             50 	.globl _PSGSFXPlay
+                             51 	.globl _PSGSFXCancelLoop
+                             52 	.globl _PSGSFXGetStatus
+                             53 	.globl _PSGSFXPlayLoop
+                             54 	.globl _PSGFrame
+                             55 	.globl _PSGSFXFrame
+                             56 ;--------------------------------------------------------
+                             57 ; special function registers
+                             58 ;--------------------------------------------------------
+                     007F    59 _PSGPort	=	0x007f
+                             60 ;--------------------------------------------------------
+                             61 ; ram data
+                             62 ;--------------------------------------------------------
+                             63 	.area _DATA
+   0000                      64 _PSGMusicStatus::
+   0000                      65 	.ds 1
+   0001                      66 _PSGMusicStart::
+   0001                      67 	.ds 2
+   0003                      68 _PSGMusicPointer::
+   0003                      69 	.ds 2
+   0005                      70 _PSGMusicLoopPoint::
+   0005                      71 	.ds 2
+   0007                      72 _PSGMusicSkipFrames::
+   0007                      73 	.ds 1
+   0008                      74 _PSGLoopFlag::
+   0008                      75 	.ds 1
+   0009                      76 _PSGMusicLastLatch::
+   0009                      77 	.ds 1
+   000A                      78 _PSGMusicVolumeAttenuation::
+   000A                      79 	.ds 1
+   000B                      80 _PSGMusicSubstringLen::
+   000B                      81 	.ds 1
+   000C                      82 _PSGMusicSubstringRetAddr::
+   000C                      83 	.ds 2
+   000E                      84 _PSGChan0Volume::
+   000E                      85 	.ds 1
+   000F                      86 _PSGChan1Volume::
+   000F                      87 	.ds 1
+   0010                      88 _PSGChan2Volume::
+   0010                      89 	.ds 1
+   0011                      90 _PSGChan3Volume::
+   0011                      91 	.ds 1
+   0012                      92 _PSGChan2LowTone::
+   0012                      93 	.ds 1
+   0013                      94 _PSGChan2HighTone::
+   0013                      95 	.ds 1
+   0014                      96 _PSGChan3LowTone::
+   0014                      97 	.ds 1
+   0015                      98 _PSGChannel2SFX::
+   0015                      99 	.ds 1
+   0016                     100 _PSGChannel3SFX::
+   0016                     101 	.ds 1
+   0017                     102 _PSGSFXChan2Volume::
+   0017                     103 	.ds 1
+   0018                     104 _PSGSFXChan3Volume::
+   0018                     105 	.ds 1
+   0019                     106 _PSGSFXStatus::
+   0019                     107 	.ds 1
+   001A                     108 _PSGSFXStart::
+   001A                     109 	.ds 2
+   001C                     110 _PSGSFXPointer::
+   001C                     111 	.ds 2
+   001E                     112 _PSGSFXLoopPoint::
+   001E                     113 	.ds 2
+   0020                     114 _PSGSFXSkipFrames::
+   0020                     115 	.ds 1
+   0021                     116 _PSGSFXLoopFlag::
+   0021                     117 	.ds 1
+   0022                     118 _PSGSFXSubstringLen::
+   0022                     119 	.ds 1
+   0023                     120 _PSGSFXSubstringRetAddr::
+   0023                     121 	.ds 2
+                            122 ;--------------------------------------------------------
+                            123 ; ram data
+                            124 ;--------------------------------------------------------
+                            125 	.area _INITIALIZED
+                            126 ;--------------------------------------------------------
+                            127 ; absolute external ram data
+                            128 ;--------------------------------------------------------
+                            129 	.area _DABS (ABS)
+                            130 ;--------------------------------------------------------
+                            131 ; global & static initialisations
+                            132 ;--------------------------------------------------------
+                            133 	.area _HOME
+                            134 	.area _GSINIT
+                            135 	.area _GSFINAL
+                            136 	.area _GSINIT
+                            137 ;--------------------------------------------------------
+                            138 ; Home
+                            139 ;--------------------------------------------------------
+                            140 	.area _HOME
+                            141 	.area _HOME
+                            142 ;--------------------------------------------------------
+                            143 ; code
+                            144 ;--------------------------------------------------------
+                            145 	.area _CODE
+                            146 ;PSGLib.c:70: void PSGStop (void) {
+                            147 ;	---------------------------------
+                            148 ; Function PSGStop
+                            149 ; ---------------------------------
+   0000                     150 _PSGStop::
+                            151 ;PSGLib.c:74: if (PSGMusicStatus) {
+   0000 3Ar00r00      [13]  152 	ld	a,(#_PSGMusicStatus + 0)
+   0003 B7            [ 4]  153 	or	a, a
+   0004 C8            [11]  154 	ret	Z
+                            155 ;PSGLib.c:75: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|0x0F;   // latch channel 0, volume=0xF (silent)
+   0005 3E 9F         [ 7]  156 	ld	a, #0x9f
+   0007 D3 7F         [11]  157 	out	(_PSGPort), a
+                            158 ;PSGLib.c:76: PSGPort=PSGLatch|PSGChannel1|PSGVolumeData|0x0F;   // latch channel 1, volume=0xF (silent)
+   0009 3E BF         [ 7]  159 	ld	a, #0xbf
+   000B D3 7F         [11]  160 	out	(_PSGPort), a
+                            161 ;PSGLib.c:77: if (!PSGChannel2SFX)
+   000D 3Ar15r00      [13]  162 	ld	a,(#_PSGChannel2SFX + 0)
+   0010 B7            [ 4]  163 	or	a, a
+   0011 20 04         [12]  164 	jr	NZ,00102$
+                            165 ;PSGLib.c:78: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|0x0F;   // latch channel 2, volume=0xF (silent)
+   0013 3E DF         [ 7]  166 	ld	a, #0xdf
+   0015 D3 7F         [11]  167 	out	(_PSGPort), a
+   0017                     168 00102$:
+                            169 ;PSGLib.c:79: if (!PSGChannel3SFX)
+   0017 3Ar16r00      [13]  170 	ld	a,(#_PSGChannel3SFX + 0)
+   001A B7            [ 4]  171 	or	a, a
+   001B 20 04         [12]  172 	jr	NZ,00104$
+                            173 ;PSGLib.c:80: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|0x0F;   // latch channel 3, volume=0xF (silent)
+   001D 3E FF         [ 7]  174 	ld	a, #0xff
+   001F D3 7F         [11]  175 	out	(_PSGPort), a
+   0021                     176 00104$:
+                            177 ;PSGLib.c:81: PSGMusicStatus=PSG_STOPPED;
+   0021 21r00r00      [10]  178 	ld	hl,#_PSGMusicStatus + 0
+   0024 36 00         [10]  179 	ld	(hl), #0x00
+                            180 ;PSGLib.c:83: }
+   0026 C9            [10]  181 	ret
+                            182 ;PSGLib.c:85: void PSGResume (void) {
+                            183 ;	---------------------------------
+                            184 ; Function PSGResume
+                            185 ; ---------------------------------
+   0027                     186 _PSGResume::
+                            187 ;PSGLib.c:89: if (!PSGMusicStatus) {
+   0027 3Ar00r00      [13]  188 	ld	a,(#_PSGMusicStatus + 0)
+   002A B7            [ 4]  189 	or	a, a
+   002B C0            [11]  190 	ret	NZ
+                            191 ;PSGLib.c:90: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|PSGChan0Volume;   // restore channel 0 volume
+   002C 3Ar0Er00      [13]  192 	ld	a,(#_PSGChan0Volume + 0)
+   002F F6 90         [ 7]  193 	or	a, #0x90
+   0031 D3 7F         [11]  194 	out	(_PSGPort), a
+                            195 ;PSGLib.c:91: PSGPort=PSGLatch|PSGChannel1|PSGVolumeData|PSGChan1Volume;   // restore channel 1 volume
+   0033 3Ar0Fr00      [13]  196 	ld	a,(#_PSGChan1Volume + 0)
+   0036 F6 B0         [ 7]  197 	or	a, #0xb0
+   0038 D3 7F         [11]  198 	out	(_PSGPort), a
+                            199 ;PSGLib.c:92: if (!PSGChannel2SFX) {
+   003A 3Ar15r00      [13]  200 	ld	a,(#_PSGChannel2SFX + 0)
+   003D B7            [ 4]  201 	or	a, a
+   003E 20 17         [12]  202 	jr	NZ,00102$
+                            203 ;PSGLib.c:93: PSGPort=PSGLatch|PSGChannel2|(PSGChan2LowTone&0x0F);       // restore channel 2 frequency
+   0040 3Ar12r00      [13]  204 	ld	a,(#_PSGChan2LowTone + 0)
+   0043 E6 0F         [ 7]  205 	and	a, #0x0f
+   0045 F6 C0         [ 7]  206 	or	a, #0xc0
+   0047 D3 7F         [11]  207 	out	(_PSGPort), a
+                            208 ;PSGLib.c:94: PSGPort=PSGChan2HighTone&0x3F;
+   0049 3Ar13r00      [13]  209 	ld	a,(#_PSGChan2HighTone + 0)
+   004C E6 3F         [ 7]  210 	and	a, #0x3f
+   004E D3 7F         [11]  211 	out	(_PSGPort), a
+                            212 ;PSGLib.c:95: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|PSGChan2Volume; // restore channel 2 volume
+   0050 3Ar10r00      [13]  213 	ld	a,(#_PSGChan2Volume + 0)
+   0053 F6 D0         [ 7]  214 	or	a, #0xd0
+   0055 D3 7F         [11]  215 	out	(_PSGPort), a
+   0057                     216 00102$:
+                            217 ;PSGLib.c:97: if (!PSGChannel3SFX) {
+   0057 3Ar16r00      [13]  218 	ld	a,(#_PSGChannel3SFX + 0)
+   005A B7            [ 4]  219 	or	a, a
+   005B 20 10         [12]  220 	jr	NZ,00104$
+                            221 ;PSGLib.c:98: PSGPort=PSGLatch|PSGChannel3|(PSGChan3LowTone&0x0F);       // restore channel 3 frequency
+   005D 3Ar14r00      [13]  222 	ld	a,(#_PSGChan3LowTone + 0)
+   0060 E6 0F         [ 7]  223 	and	a, #0x0f
+   0062 F6 E0         [ 7]  224 	or	a, #0xe0
+   0064 D3 7F         [11]  225 	out	(_PSGPort), a
+                            226 ;PSGLib.c:99: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|PSGChan3Volume; // restore channel 3 volume
+   0066 3Ar11r00      [13]  227 	ld	a,(#_PSGChan3Volume + 0)
+   0069 F6 F0         [ 7]  228 	or	a, #0xf0
+   006B D3 7F         [11]  229 	out	(_PSGPort), a
+   006D                     230 00104$:
+                            231 ;PSGLib.c:101: PSGMusicStatus=PSG_PLAYING;
+   006D 21r00r00      [10]  232 	ld	hl,#_PSGMusicStatus + 0
+   0070 36 01         [10]  233 	ld	(hl), #0x01
+                            234 ;PSGLib.c:103: }
+   0072 C9            [10]  235 	ret
+                            236 ;PSGLib.c:105: void PSGPlay (void *song) {
+                            237 ;	---------------------------------
+                            238 ; Function PSGPlay
+                            239 ; ---------------------------------
+   0073                     240 _PSGPlay::
+                            241 ;PSGLib.c:109: PSGStop();
+   0073 CDr00r00      [17]  242 	call	_PSGStop
+                            243 ;PSGLib.c:110: PSGLoopFlag=1;
+   0076 21r08r00      [10]  244 	ld	hl,#_PSGLoopFlag + 0
+   0079 36 01         [10]  245 	ld	(hl), #0x01
+                            246 ;PSGLib.c:111: PSGMusicStart=song;           // store the begin point of music
+   007B D1            [10]  247 	pop	de
+   007C C1            [10]  248 	pop	bc
+   007D C5            [11]  249 	push	bc
+   007E D5            [11]  250 	push	de
+   007F ED 43r01r00   [20]  251 	ld	(_PSGMusicStart), bc
+                            252 ;PSGLib.c:112: PSGMusicPointer=song;         // set music pointer to begin of music
+   0083 ED 43r03r00   [20]  253 	ld	(_PSGMusicPointer), bc
+                            254 ;PSGLib.c:113: PSGMusicLoopPoint=song;       // looppointer points to begin too
+   0087 ED 43r05r00   [20]  255 	ld	(_PSGMusicLoopPoint), bc
+                            256 ;PSGLib.c:115: PSGMusicSkipFrames=0;         // reset the skip frames
+   008B 21r07r00      [10]  257 	ld	hl,#_PSGMusicSkipFrames + 0
+   008E 36 00         [10]  258 	ld	(hl), #0x00
+                            259 ;PSGLib.c:116: PSGMusicSubstringLen=0;       // reset the substring len (for compression)
+   0090 21r0Br00      [10]  260 	ld	hl,#_PSGMusicSubstringLen + 0
+   0093 36 00         [10]  261 	ld	(hl), #0x00
+                            262 ;PSGLib.c:117: PSGMusicLastLatch=PSGLatch|PSGChannel0|PSGVolumeData|0x0F;   // latch channel 0, volume=0xF (silent)
+   0095 21r09r00      [10]  263 	ld	hl,#_PSGMusicLastLatch + 0
+   0098 36 9F         [10]  264 	ld	(hl), #0x9f
+                            265 ;PSGLib.c:118: PSGMusicStatus=PSG_PLAYING;
+   009A 21r00r00      [10]  266 	ld	hl,#_PSGMusicStatus + 0
+   009D 36 01         [10]  267 	ld	(hl), #0x01
+                            268 ;PSGLib.c:119: }
+   009F C9            [10]  269 	ret
+                            270 ;PSGLib.c:121: void PSGCancelLoop (void) {
+                            271 ;	---------------------------------
+                            272 ; Function PSGCancelLoop
+                            273 ; ---------------------------------
+   00A0                     274 _PSGCancelLoop::
+                            275 ;PSGLib.c:125: PSGLoopFlag=0;
+   00A0 21r08r00      [10]  276 	ld	hl,#_PSGLoopFlag + 0
+   00A3 36 00         [10]  277 	ld	(hl), #0x00
+                            278 ;PSGLib.c:126: }
+   00A5 C9            [10]  279 	ret
+                            280 ;PSGLib.c:128: void PSGPlayNoRepeat (void *song) {
+                            281 ;	---------------------------------
+                            282 ; Function PSGPlayNoRepeat
+                            283 ; ---------------------------------
+   00A6                     284 _PSGPlayNoRepeat::
+                            285 ;PSGLib.c:132: PSGPlay(song);
+   00A6 C1            [10]  286 	pop	bc
+   00A7 E1            [10]  287 	pop	hl
+   00A8 E5            [11]  288 	push	hl
+   00A9 C5            [11]  289 	push	bc
+   00AA E5            [11]  290 	push	hl
+   00AB CDr73r00      [17]  291 	call	_PSGPlay
+   00AE F1            [10]  292 	pop	af
+                            293 ;PSGLib.c:133: PSGLoopFlag=0;
+   00AF 21r08r00      [10]  294 	ld	hl,#_PSGLoopFlag + 0
+   00B2 36 00         [10]  295 	ld	(hl), #0x00
+                            296 ;PSGLib.c:134: }
+   00B4 C9            [10]  297 	ret
+                            298 ;PSGLib.c:136: unsigned char PSGGetStatus (void) {
+                            299 ;	---------------------------------
+                            300 ; Function PSGGetStatus
+                            301 ; ---------------------------------
+   00B5                     302 _PSGGetStatus::
+                            303 ;PSGLib.c:140: return(PSGMusicStatus);
+   00B5 FD 21r00r00   [14]  304 	ld	iy, #_PSGMusicStatus
+   00B9 FD 6E 00      [19]  305 	ld	l, 0 (iy)
+                            306 ;PSGLib.c:141: }
+   00BC C9            [10]  307 	ret
+                            308 ;PSGLib.c:143: void PSGSilenceChannels (void) {
+                            309 ;	---------------------------------
+                            310 ; Function PSGSilenceChannels
+                            311 ; ---------------------------------
+   00BD                     312 _PSGSilenceChannels::
+                            313 ;PSGLib.c:147: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|0x0F;
+   00BD 3E 9F         [ 7]  314 	ld	a, #0x9f
+   00BF D3 7F         [11]  315 	out	(_PSGPort), a
+                            316 ;PSGLib.c:148: PSGPort=PSGLatch|PSGChannel1|PSGVolumeData|0x0F;
+   00C1 3E BF         [ 7]  317 	ld	a, #0xbf
+   00C3 D3 7F         [11]  318 	out	(_PSGPort), a
+                            319 ;PSGLib.c:149: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|0x0F;
+   00C5 3E DF         [ 7]  320 	ld	a, #0xdf
+   00C7 D3 7F         [11]  321 	out	(_PSGPort), a
+                            322 ;PSGLib.c:150: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|0x0F;
+   00C9 3E FF         [ 7]  323 	ld	a, #0xff
+   00CB D3 7F         [11]  324 	out	(_PSGPort), a
+                            325 ;PSGLib.c:151: }
+   00CD C9            [10]  326 	ret
+                            327 ;PSGLib.c:153: void PSGRestoreVolumes (void) {
+                            328 ;	---------------------------------
+                            329 ; Function PSGRestoreVolumes
+                            330 ; ---------------------------------
+   00CE                     331 _PSGRestoreVolumes::
+   00CE DD E5         [15]  332 	push	ix
+   00D0 DD 21 00 00   [14]  333 	ld	ix,#0
+   00D4 DD 39         [15]  334 	add	ix,sp
+   00D6 F5            [11]  335 	push	af
+                            336 ;PSGLib.c:158: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|(((PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation);
+   00D7 FD 21r0Ar00   [14]  337 	ld	iy, #_PSGMusicVolumeAttenuation
+   00DB FD 7E 00      [19]  338 	ld	a, 0 (iy)
+   00DE DD 77 FE      [19]  339 	ld	-2 (ix), a
+   00E1 AF            [ 4]  340 	xor	a, a
+   00E2 DD 77 FF      [19]  341 	ld	-1 (ix), a
+   00E5 FD 4E 00      [19]  342 	ld	c, 0 (iy)
+                            343 ;PSGLib.c:157: if (PSGMusicStatus) {
+   00E8 3Ar00r00      [13]  344 	ld	a,(#_PSGMusicStatus + 0)
+   00EB B7            [ 4]  345 	or	a, a
+   00EC 28 58         [12]  346 	jr	Z,00102$
+                            347 ;PSGLib.c:158: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|(((PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation);
+   00EE 3Ar0Er00      [13]  348 	ld	a,(#_PSGChan0Volume + 0)
+   00F1 E6 0F         [ 7]  349 	and	a, #0x0f
+   00F3 5F            [ 4]  350 	ld	e, a
+   00F4 16 00         [ 7]  351 	ld	d, #0x00
+   00F6 E1            [10]  352 	pop	hl
+   00F7 E5            [11]  353 	push	hl
+   00F8 19            [11]  354 	add	hl, de
+   00F9 3E 0F         [ 7]  355 	ld	a, #0x0f
+   00FB BD            [ 4]  356 	cp	a, l
+   00FC 3E 00         [ 7]  357 	ld	a, #0x00
+   00FE 9C            [ 4]  358 	sbc	a, h
+   00FF E2r04r01      [10]  359 	jp	PO, 00168$
+   0102 EE 80         [ 7]  360 	xor	a, #0x80
+   0104                     361 00168$:
+   0104 F2r0Cr01      [10]  362 	jp	P, 00115$
+   0107 11 0F 00      [10]  363 	ld	de, #0x000f
+   010A 18 09         [12]  364 	jr	00116$
+   010C                     365 00115$:
+   010C 3Ar0Er00      [13]  366 	ld	a,(#_PSGChan0Volume + 0)
+   010F E6 0F         [ 7]  367 	and	a, #0x0f
+   0111 81            [ 4]  368 	add	a, c
+   0112 5F            [ 4]  369 	ld	e, a
+   0113 17            [ 4]  370 	rla
+   0114 9F            [ 4]  371 	sbc	a, a
+   0115                     372 00116$:
+   0115 7B            [ 4]  373 	ld	a, e
+   0116 F6 90         [ 7]  374 	or	a, #0x90
+   0118 D3 7F         [11]  375 	out	(_PSGPort), a
+                            376 ;PSGLib.c:159: PSGPort=PSGLatch|PSGChannel1|PSGVolumeData|(((PSGChan1Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan1Volume&0x0F)+PSGMusicVolumeAttenuation);
+   011A 3Ar0Fr00      [13]  377 	ld	a,(#_PSGChan1Volume + 0)
+   011D E6 0F         [ 7]  378 	and	a, #0x0f
+   011F 5F            [ 4]  379 	ld	e, a
+   0120 16 00         [ 7]  380 	ld	d, #0x00
+   0122 E1            [10]  381 	pop	hl
+   0123 E5            [11]  382 	push	hl
+   0124 19            [11]  383 	add	hl, de
+   0125 3E 0F         [ 7]  384 	ld	a, #0x0f
+   0127 BD            [ 4]  385 	cp	a, l
+   0128 3E 00         [ 7]  386 	ld	a, #0x00
+   012A 9C            [ 4]  387 	sbc	a, h
+   012B E2r30r01      [10]  388 	jp	PO, 00169$
+   012E EE 80         [ 7]  389 	xor	a, #0x80
+   0130                     390 00169$:
+   0130 F2r38r01      [10]  391 	jp	P, 00117$
+   0133 11 0F 00      [10]  392 	ld	de, #0x000f
+   0136 18 09         [12]  393 	jr	00118$
+   0138                     394 00117$:
+   0138 3Ar0Fr00      [13]  395 	ld	a,(#_PSGChan1Volume + 0)
+   013B E6 0F         [ 7]  396 	and	a, #0x0f
+   013D 81            [ 4]  397 	add	a, c
+   013E 5F            [ 4]  398 	ld	e, a
+   013F 17            [ 4]  399 	rla
+   0140 9F            [ 4]  400 	sbc	a, a
+   0141                     401 00118$:
+   0141 7B            [ 4]  402 	ld	a, e
+   0142 F6 B0         [ 7]  403 	or	a, #0xb0
+   0144 D3 7F         [11]  404 	out	(_PSGPort), a
+   0146                     405 00102$:
+                            406 ;PSGLib.c:161: if (PSGChannel2SFX)
+   0146 3Ar15r00      [13]  407 	ld	a,(#_PSGChannel2SFX + 0)
+   0149 B7            [ 4]  408 	or	a, a
+   014A 28 09         [12]  409 	jr	Z,00106$
+                            410 ;PSGLib.c:162: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|PSGSFXChan2Volume;
+   014C 3Ar17r00      [13]  411 	ld	a,(#_PSGSFXChan2Volume + 0)
+   014F F6 D0         [ 7]  412 	or	a, #0xd0
+   0151 D3 7F         [11]  413 	out	(_PSGPort), a
+   0153 18 32         [12]  414 	jr	00107$
+   0155                     415 00106$:
+                            416 ;PSGLib.c:163: else if (PSGMusicStatus)
+   0155 3Ar00r00      [13]  417 	ld	a,(#_PSGMusicStatus + 0)
+   0158 B7            [ 4]  418 	or	a, a
+   0159 28 2C         [12]  419 	jr	Z,00107$
+                            420 ;PSGLib.c:164: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|(((PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation);
+   015B 3Ar10r00      [13]  421 	ld	a,(#_PSGChan2Volume + 0)
+   015E E6 0F         [ 7]  422 	and	a, #0x0f
+   0160 5F            [ 4]  423 	ld	e, a
+   0161 16 00         [ 7]  424 	ld	d, #0x00
+   0163 E1            [10]  425 	pop	hl
+   0164 E5            [11]  426 	push	hl
+   0165 19            [11]  427 	add	hl, de
+   0166 3E 0F         [ 7]  428 	ld	a, #0x0f
+   0168 BD            [ 4]  429 	cp	a, l
+   0169 3E 00         [ 7]  430 	ld	a, #0x00
+   016B 9C            [ 4]  431 	sbc	a, h
+   016C E2r71r01      [10]  432 	jp	PO, 00170$
+   016F EE 80         [ 7]  433 	xor	a, #0x80
+   0171                     434 00170$:
+   0171 F2r79r01      [10]  435 	jp	P, 00119$
+   0174 11 0F 00      [10]  436 	ld	de, #0x000f
+   0177 18 09         [12]  437 	jr	00120$
+   0179                     438 00119$:
+   0179 3Ar10r00      [13]  439 	ld	a,(#_PSGChan2Volume + 0)
+   017C E6 0F         [ 7]  440 	and	a, #0x0f
+   017E 81            [ 4]  441 	add	a, c
+   017F 5F            [ 4]  442 	ld	e, a
+   0180 17            [ 4]  443 	rla
+   0181 9F            [ 4]  444 	sbc	a, a
+   0182                     445 00120$:
+   0182 7B            [ 4]  446 	ld	a, e
+   0183 F6 D0         [ 7]  447 	or	a, #0xd0
+   0185 D3 7F         [11]  448 	out	(_PSGPort), a
+   0187                     449 00107$:
+                            450 ;PSGLib.c:165: if (PSGChannel3SFX)
+   0187 3Ar16r00      [13]  451 	ld	a,(#_PSGChannel3SFX + 0)
+   018A B7            [ 4]  452 	or	a, a
+   018B 28 09         [12]  453 	jr	Z,00111$
+                            454 ;PSGLib.c:166: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|PSGSFXChan3Volume;
+   018D 3Ar18r00      [13]  455 	ld	a,(#_PSGSFXChan3Volume + 0)
+   0190 F6 F0         [ 7]  456 	or	a, #0xf0
+   0192 D3 7F         [11]  457 	out	(_PSGPort), a
+   0194 18 32         [12]  458 	jr	00113$
+   0196                     459 00111$:
+                            460 ;PSGLib.c:167: else if (PSGMusicStatus)
+   0196 3Ar00r00      [13]  461 	ld	a,(#_PSGMusicStatus + 0)
+   0199 B7            [ 4]  462 	or	a, a
+   019A 28 2C         [12]  463 	jr	Z,00113$
+                            464 ;PSGLib.c:168: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|(((PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation);
+   019C 3Ar11r00      [13]  465 	ld	a,(#_PSGChan3Volume + 0)
+   019F E6 0F         [ 7]  466 	and	a, #0x0f
+   01A1 6F            [ 4]  467 	ld	l, a
+   01A2 26 00         [ 7]  468 	ld	h, #0x00
+   01A4 D1            [10]  469 	pop	de
+   01A5 D5            [11]  470 	push	de
+   01A6 19            [11]  471 	add	hl, de
+   01A7 3E 0F         [ 7]  472 	ld	a, #0x0f
+   01A9 BD            [ 4]  473 	cp	a, l
+   01AA 3E 00         [ 7]  474 	ld	a, #0x00
+   01AC 9C            [ 4]  475 	sbc	a, h
+   01AD E2rB2r01      [10]  476 	jp	PO, 00171$
+   01B0 EE 80         [ 7]  477 	xor	a, #0x80
+   01B2                     478 00171$:
+   01B2 F2rBAr01      [10]  479 	jp	P, 00121$
+   01B5 01 0F 00      [10]  480 	ld	bc, #0x000f
+   01B8 18 09         [12]  481 	jr	00122$
+   01BA                     482 00121$:
+   01BA 3Ar11r00      [13]  483 	ld	a,(#_PSGChan3Volume + 0)
+   01BD E6 0F         [ 7]  484 	and	a, #0x0f
+   01BF 81            [ 4]  485 	add	a, c
+   01C0 4F            [ 4]  486 	ld	c, a
+   01C1 17            [ 4]  487 	rla
+   01C2 9F            [ 4]  488 	sbc	a, a
+   01C3                     489 00122$:
+   01C3 79            [ 4]  490 	ld	a, c
+   01C4 F6 F0         [ 7]  491 	or	a, #0xf0
+   01C6 D3 7F         [11]  492 	out	(_PSGPort), a
+   01C8                     493 00113$:
+                            494 ;PSGLib.c:169: }
+   01C8 DD F9         [10]  495 	ld	sp, ix
+   01CA DD E1         [14]  496 	pop	ix
+   01CC C9            [10]  497 	ret
+                            498 ;PSGLib.c:171: void PSGSetMusicVolumeAttenuation (unsigned char attenuation) {
+                            499 ;	---------------------------------
+                            500 ; Function PSGSetMusicVolumeAttenuation
+                            501 ; ---------------------------------
+   01CD                     502 _PSGSetMusicVolumeAttenuation::
+   01CD DD E5         [15]  503 	push	ix
+   01CF DD 21 00 00   [14]  504 	ld	ix,#0
+   01D3 DD 39         [15]  505 	add	ix,sp
+   01D5 F5            [11]  506 	push	af
+                            507 ;PSGLib.c:175: PSGMusicVolumeAttenuation=attenuation;
+   01D6 DD 7E 04      [19]  508 	ld	a, 4 (ix)
+   01D9 32r0Ar00      [13]  509 	ld	(#_PSGMusicVolumeAttenuation + 0),a
+                            510 ;PSGLib.c:176: if (PSGMusicStatus) {
+   01DC 3Ar00r00      [13]  511 	ld	a,(#_PSGMusicStatus + 0)
+   01DF B7            [ 4]  512 	or	a, a
+   01E0 CArB7r02      [10]  513 	jp	Z, 00107$
+                            514 ;PSGLib.c:177: PSGPort=PSGLatch|PSGChannel0|PSGVolumeData|(((PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan0Volume&0x0F)+PSGMusicVolumeAttenuation);
+   01E3 3Ar0Er00      [13]  515 	ld	a,(#_PSGChan0Volume + 0)
+   01E6 E6 0F         [ 7]  516 	and	a, #0x0f
+   01E8 4F            [ 4]  517 	ld	c, a
+   01E9 1E 00         [ 7]  518 	ld	e, #0x00
+   01EB FD 21r0Ar00   [14]  519 	ld	iy, #_PSGMusicVolumeAttenuation
+   01EF FD 7E 00      [19]  520 	ld	a, 0 (iy)
+   01F2 DD 77 FE      [19]  521 	ld	-2 (ix), a
+   01F5 AF            [ 4]  522 	xor	a, a
+   01F6 DD 77 FF      [19]  523 	ld	-1 (ix), a
+   01F9 79            [ 4]  524 	ld	a, c
+   01FA DD 86 FE      [19]  525 	add	a, -2 (ix)
+   01FD 47            [ 4]  526 	ld	b, a
+   01FE 7B            [ 4]  527 	ld	a, e
+   01FF DD 8E FF      [19]  528 	adc	a, -1 (ix)
+   0202 5F            [ 4]  529 	ld	e, a
+   0203 FD 4E 00      [19]  530 	ld	c, 0 (iy)
+   0206 3E 0F         [ 7]  531 	ld	a, #0x0f
+   0208 B8            [ 4]  532 	cp	a, b
+   0209 3E 00         [ 7]  533 	ld	a, #0x00
+   020B 9B            [ 4]  534 	sbc	a, e
+   020C E2r11r02      [10]  535 	jp	PO, 00152$
+   020F EE 80         [ 7]  536 	xor	a, #0x80
+   0211                     537 00152$:
+   0211 F2r19r02      [10]  538 	jp	P, 00109$
+   0214 11 0F 00      [10]  539 	ld	de, #0x000f
+   0217 18 09         [12]  540 	jr	00110$
+   0219                     541 00109$:
+   0219 3Ar0Er00      [13]  542 	ld	a,(#_PSGChan0Volume + 0)
+   021C E6 0F         [ 7]  543 	and	a, #0x0f
+   021E 81            [ 4]  544 	add	a, c
+   021F 5F            [ 4]  545 	ld	e, a
+   0220 17            [ 4]  546 	rla
+   0221 9F            [ 4]  547 	sbc	a, a
+   0222                     548 00110$:
+   0222 7B            [ 4]  549 	ld	a, e
+   0223 F6 90         [ 7]  550 	or	a, #0x90
+   0225 D3 7F         [11]  551 	out	(_PSGPort), a
+                            552 ;PSGLib.c:178: PSGPort=PSGLatch|PSGChannel1|PSGVolumeData|(((PSGChan1Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan1Volume&0x0F)+PSGMusicVolumeAttenuation);
+   0227 3Ar0Fr00      [13]  553 	ld	a,(#_PSGChan1Volume + 0)
+   022A E6 0F         [ 7]  554 	and	a, #0x0f
+   022C 5F            [ 4]  555 	ld	e, a
+   022D 16 00         [ 7]  556 	ld	d, #0x00
+   022F E1            [10]  557 	pop	hl
+   0230 E5            [11]  558 	push	hl
+   0231 19            [11]  559 	add	hl, de
+   0232 3E 0F         [ 7]  560 	ld	a, #0x0f
+   0234 BD            [ 4]  561 	cp	a, l
+   0235 3E 00         [ 7]  562 	ld	a, #0x00
+   0237 9C            [ 4]  563 	sbc	a, h
+   0238 E2r3Dr02      [10]  564 	jp	PO, 00153$
+   023B EE 80         [ 7]  565 	xor	a, #0x80
+   023D                     566 00153$:
+   023D F2r45r02      [10]  567 	jp	P, 00111$
+   0240 11 0F 00      [10]  568 	ld	de, #0x000f
+   0243 18 09         [12]  569 	jr	00112$
+   0245                     570 00111$:
+   0245 3Ar0Fr00      [13]  571 	ld	a,(#_PSGChan1Volume + 0)
+   0248 E6 0F         [ 7]  572 	and	a, #0x0f
+   024A 81            [ 4]  573 	add	a, c
+   024B 5F            [ 4]  574 	ld	e, a
+   024C 17            [ 4]  575 	rla
+   024D 9F            [ 4]  576 	sbc	a, a
+   024E                     577 00112$:
+   024E 7B            [ 4]  578 	ld	a, e
+   024F F6 B0         [ 7]  579 	or	a, #0xb0
+   0251 D3 7F         [11]  580 	out	(_PSGPort), a
+                            581 ;PSGLib.c:179: if (!PSGChannel2SFX)
+   0253 3Ar15r00      [13]  582 	ld	a,(#_PSGChannel2SFX + 0)
+   0256 B7            [ 4]  583 	or	a, a
+   0257 20 2C         [12]  584 	jr	NZ,00102$
+                            585 ;PSGLib.c:180: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|(((PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation);
+   0259 3Ar10r00      [13]  586 	ld	a,(#_PSGChan2Volume + 0)
+   025C E6 0F         [ 7]  587 	and	a, #0x0f
+   025E 6F            [ 4]  588 	ld	l, a
+   025F 26 00         [ 7]  589 	ld	h, #0x00
+   0261 D1            [10]  590 	pop	de
+   0262 D5            [11]  591 	push	de
+   0263 19            [11]  592 	add	hl, de
+   0264 3E 0F         [ 7]  593 	ld	a, #0x0f
+   0266 BD            [ 4]  594 	cp	a, l
+   0267 3E 00         [ 7]  595 	ld	a, #0x00
+   0269 9C            [ 4]  596 	sbc	a, h
+   026A E2r6Fr02      [10]  597 	jp	PO, 00154$
+   026D EE 80         [ 7]  598 	xor	a, #0x80
+   026F                     599 00154$:
+   026F F2r77r02      [10]  600 	jp	P, 00113$
+   0272 11 0F 00      [10]  601 	ld	de, #0x000f
+   0275 18 09         [12]  602 	jr	00114$
+   0277                     603 00113$:
+   0277 3Ar10r00      [13]  604 	ld	a,(#_PSGChan2Volume + 0)
+   027A E6 0F         [ 7]  605 	and	a, #0x0f
+   027C 81            [ 4]  606 	add	a, c
+   027D 5F            [ 4]  607 	ld	e, a
+   027E 17            [ 4]  608 	rla
+   027F 9F            [ 4]  609 	sbc	a, a
+   0280                     610 00114$:
+   0280 7B            [ 4]  611 	ld	a, e
+   0281 F6 D0         [ 7]  612 	or	a, #0xd0
+   0283 D3 7F         [11]  613 	out	(_PSGPort), a
+   0285                     614 00102$:
+                            615 ;PSGLib.c:181: if (!PSGChannel3SFX)
+   0285 3Ar16r00      [13]  616 	ld	a,(#_PSGChannel3SFX + 0)
+   0288 B7            [ 4]  617 	or	a, a
+   0289 20 2C         [12]  618 	jr	NZ,00107$
+                            619 ;PSGLib.c:182: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|(((PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation);
+   028B 3Ar11r00      [13]  620 	ld	a,(#_PSGChan3Volume + 0)
+   028E E6 0F         [ 7]  621 	and	a, #0x0f
+   0290 6F            [ 4]  622 	ld	l, a
+   0291 26 00         [ 7]  623 	ld	h, #0x00
+   0293 D1            [10]  624 	pop	de
+   0294 D5            [11]  625 	push	de
+   0295 19            [11]  626 	add	hl, de
+   0296 3E 0F         [ 7]  627 	ld	a, #0x0f
+   0298 BD            [ 4]  628 	cp	a, l
+   0299 3E 00         [ 7]  629 	ld	a, #0x00
+   029B 9C            [ 4]  630 	sbc	a, h
+   029C E2rA1r02      [10]  631 	jp	PO, 00155$
+   029F EE 80         [ 7]  632 	xor	a, #0x80
+   02A1                     633 00155$:
+   02A1 F2rA9r02      [10]  634 	jp	P, 00115$
+   02A4 01 0F 00      [10]  635 	ld	bc, #0x000f
+   02A7 18 09         [12]  636 	jr	00116$
+   02A9                     637 00115$:
+   02A9 3Ar11r00      [13]  638 	ld	a,(#_PSGChan3Volume + 0)
+   02AC E6 0F         [ 7]  639 	and	a, #0x0f
+   02AE 81            [ 4]  640 	add	a, c
+   02AF 4F            [ 4]  641 	ld	c, a
+   02B0 17            [ 4]  642 	rla
+   02B1 9F            [ 4]  643 	sbc	a, a
+   02B2                     644 00116$:
+   02B2 79            [ 4]  645 	ld	a, c
+   02B3 F6 F0         [ 7]  646 	or	a, #0xf0
+   02B5 D3 7F         [11]  647 	out	(_PSGPort), a
+   02B7                     648 00107$:
+                            649 ;PSGLib.c:184: }
+   02B7 DD F9         [10]  650 	ld	sp, ix
+   02B9 DD E1         [14]  651 	pop	ix
+   02BB C9            [10]  652 	ret
+                            653 ;PSGLib.c:186: void PSGSFXStop (void) {
+                            654 ;	---------------------------------
+                            655 ; Function PSGSFXStop
+                            656 ; ---------------------------------
+   02BC                     657 _PSGSFXStop::
+   02BC DD E5         [15]  658 	push	ix
+   02BE DD 21 00 00   [14]  659 	ld	ix,#0
+   02C2 DD 39         [15]  660 	add	ix,sp
+   02C4 F5            [11]  661 	push	af
+                            662 ;PSGLib.c:190: if (PSGSFXStatus) {
+   02C5 3Ar19r00      [13]  663 	ld	a,(#_PSGSFXStatus + 0)
+   02C8 B7            [ 4]  664 	or	a, a
+   02C9 CAr81r03      [10]  665 	jp	Z, 00113$
+                            666 ;PSGLib.c:195: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|(((PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation);
+   02CC FD 21r0Ar00   [14]  667 	ld	iy, #_PSGMusicVolumeAttenuation
+   02D0 FD 7E 00      [19]  668 	ld	a, 0 (iy)
+   02D3 DD 77 FE      [19]  669 	ld	-2 (ix), a
+   02D6 AF            [ 4]  670 	xor	a, a
+   02D7 DD 77 FF      [19]  671 	ld	-1 (ix), a
+   02DA FD 4E 00      [19]  672 	ld	c, 0 (iy)
+                            673 ;PSGLib.c:191: if (PSGChannel2SFX) {
+   02DD 3Ar15r00      [13]  674 	ld	a,(#_PSGChannel2SFX + 0)
+   02E0 B7            [ 4]  675 	or	a, a
+   02E1 28 4D         [12]  676 	jr	Z,00105$
+                            677 ;PSGLib.c:192: if (PSGMusicStatus) {
+   02E3 3Ar00r00      [13]  678 	ld	a,(#_PSGMusicStatus + 0)
+   02E6 B7            [ 4]  679 	or	a, a
+   02E7 28 3E         [12]  680 	jr	Z,00102$
+                            681 ;PSGLib.c:193: PSGPort=PSGLatch|PSGChannel2|(PSGChan2LowTone&0x0F);
+   02E9 3Ar12r00      [13]  682 	ld	a,(#_PSGChan2LowTone + 0)
+   02EC E6 0F         [ 7]  683 	and	a, #0x0f
+   02EE F6 C0         [ 7]  684 	or	a, #0xc0
+   02F0 D3 7F         [11]  685 	out	(_PSGPort), a
+                            686 ;PSGLib.c:194: PSGPort=PSGChan2HighTone&0x3F;
+   02F2 3Ar13r00      [13]  687 	ld	a,(#_PSGChan2HighTone + 0)
+   02F5 E6 3F         [ 7]  688 	and	a, #0x3f
+   02F7 D3 7F         [11]  689 	out	(_PSGPort), a
+                            690 ;PSGLib.c:195: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|(((PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan2Volume&0x0F)+PSGMusicVolumeAttenuation);
+   02F9 3Ar10r00      [13]  691 	ld	a,(#_PSGChan2Volume + 0)
+   02FC E6 0F         [ 7]  692 	and	a, #0x0f
+   02FE 5F            [ 4]  693 	ld	e, a
+   02FF 16 00         [ 7]  694 	ld	d, #0x00
+   0301 E1            [10]  695 	pop	hl
+   0302 E5            [11]  696 	push	hl
+   0303 19            [11]  697 	add	hl, de
+   0304 3E 0F         [ 7]  698 	ld	a, #0x0f
+   0306 BD            [ 4]  699 	cp	a, l
+   0307 3E 00         [ 7]  700 	ld	a, #0x00
+   0309 9C            [ 4]  701 	sbc	a, h
+   030A E2r0Fr03      [10]  702 	jp	PO, 00154$
+   030D EE 80         [ 7]  703 	xor	a, #0x80
+   030F                     704 00154$:
+   030F F2r17r03      [10]  705 	jp	P, 00115$
+   0312 11 0F 00      [10]  706 	ld	de, #0x000f
+   0315 18 09         [12]  707 	jr	00116$
+   0317                     708 00115$:
+   0317 3Ar10r00      [13]  709 	ld	a,(#_PSGChan2Volume + 0)
+   031A E6 0F         [ 7]  710 	and	a, #0x0f
+   031C 81            [ 4]  711 	add	a, c
+   031D 5F            [ 4]  712 	ld	e, a
+   031E 17            [ 4]  713 	rla
+   031F 9F            [ 4]  714 	sbc	a, a
+   0320                     715 00116$:
+   0320 7B            [ 4]  716 	ld	a, e
+   0321 F6 D0         [ 7]  717 	or	a, #0xd0
+   0323 D3 7F         [11]  718 	out	(_PSGPort), a
+   0325 18 04         [12]  719 	jr	00103$
+   0327                     720 00102$:
+                            721 ;PSGLib.c:197: PSGPort=PSGLatch|PSGChannel2|PSGVolumeData|0x0F;
+   0327 3E DF         [ 7]  722 	ld	a, #0xdf
+   0329 D3 7F         [11]  723 	out	(_PSGPort), a
+   032B                     724 00103$:
+                            725 ;PSGLib.c:199: PSGChannel2SFX=PSG_STOPPED;
+   032B 21r15r00      [10]  726 	ld	hl,#_PSGChannel2SFX + 0
+   032E 36 00         [10]  727 	ld	(hl), #0x00
+   0330                     728 00105$:
+                            729 ;PSGLib.c:202: if (PSGChannel3SFX) {
+   0330 3Ar16r00      [13]  730 	ld	a,(#_PSGChannel3SFX + 0)
+   0333 B7            [ 4]  731 	or	a, a
+   0334 28 46         [12]  732 	jr	Z,00110$
+                            733 ;PSGLib.c:203: if (PSGMusicStatus) {
+   0336 3Ar00r00      [13]  734 	ld	a,(#_PSGMusicStatus + 0)
+   0339 B7            [ 4]  735 	or	a, a
+   033A 28 37         [12]  736 	jr	Z,00107$
+                            737 ;PSGLib.c:204: PSGPort=PSGLatch|PSGChannel3|(PSGChan3LowTone&0x0F);
+   033C 3Ar14r00      [13]  738 	ld	a,(#_PSGChan3LowTone + 0)
+   033F E6 0F         [ 7]  739 	and	a, #0x0f
+   0341 F6 E0         [ 7]  740 	or	a, #0xe0
+   0343 D3 7F         [11]  741 	out	(_PSGPort), a
+                            742 ;PSGLib.c:205: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|(((PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation>15)?15:(PSGChan3Volume&0x0F)+PSGMusicVolumeAttenuation);
+   0345 3Ar11r00      [13]  743 	ld	a,(#_PSGChan3Volume + 0)
+   0348 E6 0F         [ 7]  744 	and	a, #0x0f
+   034A 6F            [ 4]  745 	ld	l, a
+   034B 26 00         [ 7]  746 	ld	h, #0x00
+   034D D1            [10]  747 	pop	de
+   034E D5            [11]  748 	push	de
+   034F 19            [11]  749 	add	hl, de
+   0350 3E 0F         [ 7]  750 	ld	a, #0x0f
+   0352 BD            [ 4]  751 	cp	a, l
+   0353 3E 00         [ 7]  752 	ld	a, #0x00
+   0355 9C            [ 4]  753 	sbc	a, h
+   0356 E2r5Br03      [10]  754 	jp	PO, 00155$
+   0359 EE 80         [ 7]  755 	xor	a, #0x80
+   035B                     756 00155$:
+   035B F2r63r03      [10]  757 	jp	P, 00117$
+   035E 01 0F 00      [10]  758 	ld	bc, #0x000f
+   0361 18 09         [12]  759 	jr	00118$
+   0363                     760 00117$:
+   0363 3Ar11r00      [13]  761 	ld	a,(#_PSGChan3Volume + 0)
+   0366 E6 0F         [ 7]  762 	and	a, #0x0f
+   0368 81            [ 4]  763 	add	a, c
+   0369 4F            [ 4]  764 	ld	c, a
+   036A 17            [ 4]  765 	rla
+   036B 9F            [ 4]  766 	sbc	a, a
+   036C                     767 00118$:
+   036C 79            [ 4]  768 	ld	a, c
+   036D F6 F0         [ 7]  769 	or	a, #0xf0
+   036F D3 7F         [11]  770 	out	(_PSGPort), a
+   0371 18 04         [12]  771 	jr	00108$
+   0373                     772 00107$:
+                            773 ;PSGLib.c:207: PSGPort=PSGLatch|PSGChannel3|PSGVolumeData|0x0F;
+   0373 3E FF         [ 7]  774 	ld	a, #0xff
+   0375 D3 7F         [11]  775 	out	(_PSGPort), a
+   0377                     776 00108$:
+                            777 ;PSGLib.c:209: PSGChannel3SFX=PSG_STOPPED;
+   0377 21r16r00      [10]  778 	ld	hl,#_PSGChannel3SFX + 0
+   037A 36 00         [10]  779 	ld	(hl), #0x00
+   037C                     780 00110$:
+                            781 ;PSGLib.c:211: PSGSFXStatus=PSG_STOPPED;
+   037C 21r19r00      [10]  782 	ld	hl,#_PSGSFXStatus + 0
+   037F 36 00         [10]  783 	ld	(hl), #0x00
+   0381                     784 00113$:
+                            785 ;PSGLib.c:213: }
+   0381 DD F9         [10]  786 	ld	sp, ix
+   0383 DD E1         [14]  787 	pop	ix
+   0385 C9            [10]  788 	ret
+                            789 ;PSGLib.c:215: void PSGSFXPlay (void *sfx, unsigned char channels) {
+                            790 ;	---------------------------------
+                            791 ; Function PSGSFXPlay
+                            792 ; ---------------------------------
+   0386                     793 _PSGSFXPlay::
+                            794 ;PSGLib.c:220: PSGSFXStop();
+   0386 CDrBCr02      [17]  795 	call	_PSGSFXStop
+                            796 ;PSGLib.c:221: PSGSFXLoopFlag=0;
+   0389 21r21r00      [10]  797 	ld	hl,#_PSGSFXLoopFlag + 0
+   038C 36 00         [10]  798 	ld	(hl), #0x00
+                            799 ;PSGLib.c:222: PSGSFXStart=sfx;              // store begin of SFX
+   038E D1            [10]  800 	pop	de
+   038F C1            [10]  801 	pop	bc
+   0390 C5            [11]  802 	push	bc
+   0391 D5            [11]  803 	push	de
+   0392 ED 43r1Ar00   [20]  804 	ld	(_PSGSFXStart), bc
+                            805 ;PSGLib.c:223: PSGSFXPointer=sfx;            // set the pointer to begin of SFX
+   0396 ED 43r1Cr00   [20]  806 	ld	(_PSGSFXPointer), bc
+                            807 ;PSGLib.c:224: PSGSFXLoopPoint=sfx;          // looppointer points to begin too
+   039A ED 43r1Er00   [20]  808 	ld	(_PSGSFXLoopPoint), bc
+                            809 ;PSGLib.c:225: PSGSFXSkipFrames=0;           // reset the skip frames
+   039E 21r20r00      [10]  810 	ld	hl,#_PSGSFXSkipFrames + 0
+   03A1 36 00         [10]  811 	ld	(hl), #0x00
+                            812 ;PSGLib.c:226: PSGSFXSubstringLen=0;         // reset the substring len
+   03A3 21r22r00      [10]  813 	ld	hl,#_PSGSFXSubstringLen + 0
+   03A6 36 00         [10]  814 	ld	(hl), #0x00
+                            815 ;PSGLib.c:227: PSGChannel2SFX=(channels&SFX_CHANNEL2)?PSG_PLAYING:PSG_STOPPED;
+   03A8 21 04 00      [10]  816 	ld	hl, #4+0
+   03AB 39            [11]  817 	add	hl, sp
+   03AC 4E            [ 7]  818 	ld	c, (hl)
+   03AD CB 41         [ 8]  819 	bit	0, c
+   03AF 28 05         [12]  820 	jr	Z,00103$
+   03B1 11 01 00      [10]  821 	ld	de, #0x0001
+   03B4 18 03         [12]  822 	jr	00104$
+   03B6                     823 00103$:
+   03B6 11 00 00      [10]  824 	ld	de, #0x0000
+   03B9                     825 00104$:
+   03B9 21r15r00      [10]  826 	ld	hl,#_PSGChannel2SFX + 0
+   03BC 73            [ 7]  827 	ld	(hl), e
+                            828 ;PSGLib.c:228: PSGChannel3SFX=(channels&SFX_CHANNEL3)?PSG_PLAYING:PSG_STOPPED;
+   03BD CB 49         [ 8]  829 	bit	1, c
+   03BF 28 05         [12]  830 	jr	Z,00105$
+   03C1 01 01 00      [10]  831 	ld	bc, #0x0001
+   03C4 18 03         [12]  832 	jr	00106$
+   03C6                     833 00105$:
+   03C6 01 00 00      [10]  834 	ld	bc, #0x0000
+   03C9                     835 00106$:
+   03C9 21r16r00      [10]  836 	ld	hl,#_PSGChannel3SFX + 0
+   03CC 71            [ 7]  837 	ld	(hl), c
+                            838 ;PSGLib.c:229: PSGSFXStatus=PSG_PLAYING;
+   03CD 21r19r00      [10]  839 	ld	hl,#_PSGSFXStatus + 0
+   03D0 36 01         [10]  840 	ld	(hl), #0x01
+                            841 ;PSGLib.c:230: }
+   03D2 C9            [10]  842 	ret
+                            843 ;PSGLib.c:232: void PSGSFXCancelLoop (void) {
+                            844 ;	---------------------------------
+                            845 ; Function PSGSFXCancelLoop
+                            846 ; ---------------------------------
+   03D3                     847 _PSGSFXCancelLoop::
+                            848 ;PSGLib.c:236: PSGSFXLoopFlag=0;
+   03D3 21r21r00      [10]  849 	ld	hl,#_PSGSFXLoopFlag + 0
+   03D6 36 00         [10]  850 	ld	(hl), #0x00
+                            851 ;PSGLib.c:237: }
+   03D8 C9            [10]  852 	ret
+                            853 ;PSGLib.c:239: unsigned char PSGSFXGetStatus (void) {
+                            854 ;	---------------------------------
+                            855 ; Function PSGSFXGetStatus
+                            856 ; ---------------------------------
+   03D9                     857 _PSGSFXGetStatus::
+                            858 ;PSGLib.c:243: return(PSGSFXStatus);
+   03D9 FD 21r19r00   [14]  859 	ld	iy, #_PSGSFXStatus
+   03DD FD 6E 00      [19]  860 	ld	l, 0 (iy)
+                            861 ;PSGLib.c:244: }
+   03E0 C9            [10]  862 	ret
+                            863 ;PSGLib.c:246: void PSGSFXPlayLoop (void *sfx, unsigned char channels) {
+                            864 ;	---------------------------------
+                            865 ; Function PSGSFXPlayLoop
+                            866 ; ---------------------------------
+   03E1                     867 _PSGSFXPlayLoop::
+                            868 ;PSGLib.c:251: PSGSFXPlay(sfx, channels);
+   03E1 FD 21 04 00   [14]  869 	ld	iy, #4
+   03E5 FD 39         [15]  870 	add	iy, sp
+   03E7 FD 7E 00      [19]  871 	ld	a, 0 (iy)
+   03EA F5            [11]  872 	push	af
+   03EB 33            [ 6]  873 	inc	sp
+   03EC FD 2B         [10]  874 	dec	iy
+   03EE FD 2B         [10]  875 	dec	iy
+   03F0 FD 6E 00      [19]  876 	ld	l, 0 (iy)
+   03F3 FD 66 01      [19]  877 	ld	h, 1 (iy)
+   03F6 E5            [11]  878 	push	hl
+   03F7 CDr86r03      [17]  879 	call	_PSGSFXPlay
+   03FA F1            [10]  880 	pop	af
+   03FB 33            [ 6]  881 	inc	sp
+                            882 ;PSGLib.c:252: PSGSFXLoopFlag=1;
+   03FC 21r21r00      [10]  883 	ld	hl,#_PSGSFXLoopFlag + 0
+   03FF 36 01         [10]  884 	ld	(hl), #0x01
+                            885 ;PSGLib.c:253: }
+   0401 C9            [10]  886 	ret
+                            887 ;PSGLib.c:255: void PSGFrame (void) {
+                            888 ;	---------------------------------
+                            889 ; Function PSGFrame
+                            890 ; ---------------------------------
+   0402                     891 _PSGFrame::
+                            892 ;PSGLib.c:450: __endasm;
+   0402 3Ar00r00      [13]  893 	ld	a,(_PSGMusicStatus) ; check if we have got to play a tune
+   0405 B7            [ 4]  894 	or	a
+   0406 C8            [11]  895 	ret	z
+   0407 3Ar07r00      [13]  896 	ld	a,(_PSGMusicSkipFrames) ; check if we have got to skip frames
+   040A B7            [ 4]  897 	or	a
+   040B C2r96r04      [10]  898 	jp	nz,_skipFrame
+   040E 2Ar03r00      [16]  899 	ld	hl,(_PSGMusicPointer) ; read current address
+   0411                     900 	_intLoop:
+   0411 46            [ 7]  901 	ld	b,(hl) ; load PSG byte (in B)
+   0412 23            [ 6]  902 	inc	hl ; point to next byte
+   0413 3Ar0Br00      [13]  903 	ld	a,(_PSGMusicSubstringLen) ; read substring len
+   0416 B7            [ 4]  904 	or	a
+   0417 28 09         [12]  905 	jr	z,_continue ; check if it is 0 (we are not in a substring)
+   0419 3D            [ 4]  906 	dec	a ; decrease len
+   041A 32r0Br00      [13]  907 	ld	(_PSGMusicSubstringLen),a ; save len
+   041D 20 03         [12]  908 	jr	nz,_continue
+   041F 2Ar0Cr00      [16]  909 	ld	hl,(_PSGMusicSubstringRetAddr) ; substring is over, retrieve return address
+   0422                     910 	_continue:
+   0422 78            [ 4]  911 	ld	a,b ; copy PSG byte into A
+   0423 FE 80         [ 7]  912 	cp	#0x80 ; is it a latch?
+   0425 38 74         [12]  913 	jr	c,_noLatch ; if < $80 then it is NOT a latch
+   0427 32r09r00      [13]  914 	ld	(_PSGMusicLastLatch),a ; it is a latch - save it in "LastLatch"
+                            915 ;	we have got the latch PSG byte both in A and in B
+                            916 ;	and we have to check if the value should pass to PSG or not
+   042A CB 67         [ 8]  917 	bit	4,a ; test if it is a volume
+   042C 20 38         [12]  918 	jr	nz,_latch_Volume ; jump if volume data
+   042E CB 77         [ 8]  919 	bit	6,a ; test if the latch it is for channels 0-1 or for 2-3
+   0430 CArC2r04      [10]  920 	jp	z,_send2PSG_A ; send data to PSG if it is for channels 0-1
+                            921 ;	we have got the latch (tone, chn 2 or 3) PSG byte both in A and in B
+                            922 ;	and we have to check if the value should be passed to PSG or not
+   0433 CB 6F         [ 8]  923 	bit	5,a ; test if tone it is for channel 2 or 3
+   0435 28 23         [12]  924 	jr	z,_ifchn2 ; jump if channel 2
+   0437 32r14r00      [13]  925 	ld	(_PSGChan3LowTone),a ; save tone LOW data
+   043A 3Ar16r00      [13]  926 	ld	a,(_PSGChannel3SFX) ; channel 3 free?
+   043D B7            [ 4]  927 	or	a
+   043E C2r11r04      [10]  928 	jp	nz,_intLoop
+   0441 3Ar14r00      [13]  929 	ld	a,(_PSGChan3LowTone)
+   0444 E6 03         [ 7]  930 	and	#3 ; test if channel 3 is set to use the frequency of channel 2
+   0446 FE 03         [ 7]  931 	cp	#3
+   0448 20 77         [12]  932 	jr	nz,_send2PSG_B ; if channel 3 does not use frequency of channel 2 jump
+   044A 3Ar19r00      [13]  933 	ld	a,(_PSGSFXStatus) ; test if an SFX is playing
+   044D B7            [ 4]  934 	or	a
+   044E 28 71         [12]  935 	jr	z,_send2PSG_B ; if no SFX is playing jump
+   0450 32r16r00      [13]  936 	ld	(_PSGChannel3SFX),a ; otherwise mark channel 3 as occupied
+   0453 3E FF         [ 7]  937 	ld	a,#0x80|#0b01100000|#0b00010000|#0x0F ; and silence channel 3
+   0455 D3 7F         [11]  938 	out	(#0x7f),a
+   0457 C3r11r04      [10]  939 	jp	_intLoop
+   045A                     940 	_ifchn2:
+   045A 32r12r00      [13]  941 	ld	(_PSGChan2LowTone),a ; save tone LOW data
+   045D 3Ar15r00      [13]  942 	ld	a,(_PSGChannel2SFX) ; channel 2 free?
+   0460 B7            [ 4]  943 	or	a
+   0461 28 5E         [12]  944 	jr	z,_send2PSG_B
+   0463 C3r11r04      [10]  945 	jp	_intLoop
+   0466                     946 	_latch_Volume:
+   0466 CB 77         [ 8]  947 	bit	6,a ; test if the latch it is for channels 0-1 or for 2-3
+   0468 20 10         [12]  948 	jr	nz,_latch_Volume_23 ; volume is for channel 2 or 3
+   046A CB 6F         [ 8]  949 	bit	5,a ; test if volume it is for channel 0 or 1
+   046C 28 06         [12]  950 	jr	z,_chn0 ; jump for channel 0
+   046E 32r0Fr00      [13]  951 	ld	(_PSGChan1Volume),a ; save volume data
+   0471 C3rC8r04      [10]  952 	jp	_sendVolume2PSG_A
+   0474                     953 	_chn0:
+   0474 32r0Er00      [13]  954 	ld	(_PSGChan0Volume),a ; save volume data
+   0477 C3rC8r04      [10]  955 	jp	_sendVolume2PSG_A
+   047A                     956 	_latch_Volume_23:
+   047A CB 6F         [ 8]  957 	bit	5,a ; test if volume it is for channel 2 or 3
+   047C 28 0C         [12]  958 	jr	z,_chn2 ; jump for channel 2
+   047E 32r11r00      [13]  959 	ld	(_PSGChan3Volume),a ; save volume data
+   0481 3Ar16r00      [13]  960 	ld	a,(_PSGChannel3SFX) ; channel 3 free?
+   0484 B7            [ 4]  961 	or	a
+   0485 28 40         [12]  962 	jr	z,_sendVolume2PSG_B
+   0487 C3r11r04      [10]  963 	jp	_intLoop
+   048A                     964 	_chn2:
+   048A 32r10r00      [13]  965 	ld	(_PSGChan2Volume),a ; save volume data
+   048D 3Ar15r00      [13]  966 	ld	a,(_PSGChannel2SFX) ; channel 2 free?
+   0490 B7            [ 4]  967 	or	a
+   0491 28 34         [12]  968 	jr	z,_sendVolume2PSG_B
+   0493 C3r11r04      [10]  969 	jp	_intLoop
+   0496                     970 	_skipFrame:
+   0496 3D            [ 4]  971 	dec	a
+   0497 32r07r00      [13]  972 	ld	(_PSGMusicSkipFrames),a
+   049A C9            [10]  973 	ret
+   049B                     974 	_noLatch:
+   049B FE 40         [ 7]  975 	cp	#0x40
+   049D 38 06         [12]  976 	jr	c,_command ; if < $40 then it is a command
+                            977 ;	it is a data
+   049F 3Ar09r00      [13]  978 	ld	a,(_PSGMusicLastLatch) ; retrieve last latch
+   04A2 C3rE0r04      [10]  979 	jp	_output_NoLatch
+   04A5                     980 	_command:
+   04A5 FE 38         [ 7]  981 	cp	#0x38
+   04A7 28 07         [12]  982 	jr	z,_done ; no additional frames
+   04A9 38 09         [12]  983 	jr	c,_otherCommands ; other commands?
+   04AB E6 07         [ 7]  984 	and	#0x07 ; take only the last 3 bits for skip frames
+   04AD 32r07r00      [13]  985 	ld	(_PSGMusicSkipFrames),a ; we got additional frames
+   04B0                     986 	_done:
+   04B0 22r03r00      [16]  987 	ld	(_PSGMusicPointer),hl ; save current address
+   04B3 C9            [10]  988 	ret	; frame done
+   04B4                     989 	_otherCommands:
+   04B4 FE 08         [ 7]  990 	cp	#0x08
+   04B6 30 42         [12]  991 	jr	nc,_substring
+   04B8 FE 00         [ 7]  992 	cp	#0x00
+   04BA 28 31         [12]  993 	jr	z,_musicLoop
+   04BC FE 01         [ 7]  994 	cp	#0x01
+   04BE 28 27         [12]  995 	jr	z,_setLoopPoint
+                            996 ;	***************************************************************************
+                            997 ;	we should never get here!
+                            998 ;	if we do, it means the PSG file is probably corrupted, so we just RET
+                            999 ;	***************************************************************************
+   04C0 C9            [10] 1000 	ret
+   04C1                    1001 	_send2PSG_B:
+   04C1 78            [ 4] 1002 	ld	a,b
+   04C2                    1003 	_send2PSG_A:
+   04C2 D3 7F         [11] 1004 	out	(#0x7f),a ; output the byte
+   04C4 C3r11r04      [10] 1005 	jp	_intLoop
+   04C7                    1006 	_sendVolume2PSG_B:
+   04C7 78            [ 4] 1007 	ld	a,b
+   04C8                    1008 	_sendVolume2PSG_A:
+   04C8 4F            [ 4] 1009 	ld	c,a ; save the PSG command byte
+   04C9 E6 0F         [ 7] 1010 	and	#0x0F ; keep lower nibble
+   04CB 47            [ 4] 1011 	ld	b,a ; save value
+   04CC 3Ar0Ar00      [13] 1012 	ld	a,(_PSGMusicVolumeAttenuation) ; load volume attenuation
+   04CF 80            [ 4] 1013 	add	a,b ; add value
+   04D0 FE 0F         [ 7] 1014 	cp	#0x0F ; check overflow
+   04D2 38 02         [12] 1015 	jr	c,_no_overflow ; if it is <=15 then ok
+   04D4 3E 0F         [ 7] 1016 	ld	a,#0x0F ; else, reset to 15
+   04D6                    1017 	_no_overflow:
+   04D6 47            [ 4] 1018 	ld	b,a ; save new attenuated volume value
+   04D7 79            [ 4] 1019 	ld	a,c ; retrieve PSG command
+   04D8 E6 F0         [ 7] 1020 	and	#0xF0 ; keep upper nibble
+   04DA B0            [ 4] 1021 	or	b ; set attenuated volume
+   04DB D3 7F         [11] 1022 	out	(#0x7f),a ; output the byte
+   04DD C3r11r04      [10] 1023 	jp	_intLoop
+   04E0                    1024 	_output_NoLatch:
+                           1025 ;	we got the last latch in A and the PSG data in B
+                           1026 ;	and we have to check if the value should pass to PSG or not
+                           1027 ;	note that non-latch commands can be only contain frequencies (no volumes)
+                           1028 ;	for channels 0,1,2 only (no noise)
+   04E0 CB 77         [ 8] 1029 	bit	6,a ; test if the latch it is for channels 0-1 or for chn 2
+   04E2 20 29         [12] 1030 	jr	nz,_high_part_Tone ; it is tone data for channel 2
+   04E4 C3rC1r04      [10] 1031 	jp	_send2PSG_B ; otherwise, it is for chn 0 or 1 so we have done!
+   04E7                    1032 	_setLoopPoint:
+   04E7 22r05r00      [16] 1033 	ld	(_PSGMusicLoopPoint),hl
+   04EA C3r11r04      [10] 1034 	jp	_intLoop
+   04ED                    1035 	_musicLoop:
+   04ED 3Ar08r00      [13] 1036 	ld	a,(_PSGLoopFlag) ; looping requested?
+   04F0 B7            [ 4] 1037 	or	a
+   04F1 CAr00r00      [10] 1038 	jp	z,_PSGStop ; No:stop it! (tail call optimization)
+   04F4 2Ar05r00      [16] 1039 	ld	hl,(_PSGMusicLoopPoint)
+   04F7 C3r11r04      [10] 1040 	jp	_intLoop
+   04FA                    1041 	_substring:
+   04FA D6 04         [ 7] 1042 	sub	#0x08 -4 ; len is value - $08 + 4
+   04FC 32r0Br00      [13] 1043 	ld	(_PSGMusicSubstringLen),a ; save len
+   04FF 4E            [ 7] 1044 	ld	c,(hl) ; load substring address (offset)
+   0500 23            [ 6] 1045 	inc	hl
+   0501 46            [ 7] 1046 	ld	b,(hl)
+   0502 23            [ 6] 1047 	inc	hl
+   0503 22r0Cr00      [16] 1048 	ld	(_PSGMusicSubstringRetAddr),hl ; save return address
+   0506 2Ar01r00      [16] 1049 	ld	hl,(_PSGMusicStart)
+   0509 09            [11] 1050 	add	hl,bc ; make substring current
+   050A C3r11r04      [10] 1051 	jp	_intLoop
+   050D                    1052 	_high_part_Tone:
+                           1053 ;	we got the last latch in A and the PSG data in B
+                           1054 ;	and we have to check if the value should pass to PSG or not
+                           1055 ;	PSG data can only be for channel 2, here
+   050D 78            [ 4] 1056 	ld	a,b ; move PSG data in A
+   050E 32r13r00      [13] 1057 	ld	(_PSGChan2HighTone),a ; save channel 2 tone HIGH data
+   0511 3Ar15r00      [13] 1058 	ld	a,(_PSGChannel2SFX) ; channel 2 free?
+   0514 B7            [ 4] 1059 	or	a
+   0515 28 AA         [12] 1060 	jr	z,_send2PSG_B
+   0517 C3r11r04      [10] 1061 	jp	_intLoop
+                           1062 ;PSGLib.c:451: }
+   051A C9            [10] 1063 	ret
+                           1064 ;PSGLib.c:453: void PSGSFXFrame (void) {
+                           1065 ;	---------------------------------
+                           1066 ; Function PSGSFXFrame
+                           1067 ; ---------------------------------
+   051B                    1068 _PSGSFXFrame::
+                           1069 ;PSGLib.c:550: __endasm;
+   051B 3Ar19r00      [13] 1070 	ld	a,(_PSGSFXStatus) ; check if we have got to play SFX
+   051E B7            [ 4] 1071 	or	a
+   051F C8            [11] 1072 	ret	z
+   0520 3Ar20r00      [13] 1073 	ld	a,(_PSGSFXSkipFrames) ; check if we have got to skip frames
+   0523 B7            [ 4] 1074 	or	a
+   0524 C2r56r05      [10] 1075 	jp	nz,_skipSFXFrame
+   0527 2Ar1Cr00      [16] 1076 	ld	hl,(_PSGSFXPointer) ; read current SFX address
+   052A                    1077 	_intSFXLoop:
+   052A 46            [ 7] 1078 	ld	b,(hl) ; load a byte in B, temporary
+   052B 23            [ 6] 1079 	inc	hl ; point to next byte
+   052C 3Ar22r00      [13] 1080 	ld	a,(_PSGSFXSubstringLen) ; read substring len
+   052F B7            [ 4] 1081 	or	a ; check if it is 0 (we are not in a substring)
+   0530 28 09         [12] 1082 	jr	z,_SFXcontinue
+   0532 3D            [ 4] 1083 	dec	a ; decrease len
+   0533 32r22r00      [13] 1084 	ld	(_PSGSFXSubstringLen),a ; save len
+   0536 20 03         [12] 1085 	jr	nz,_SFXcontinue
+   0538 2Ar23r00      [16] 1086 	ld	hl,(_PSGSFXSubstringRetAddr) ; substring over, retrieve return address
+   053B                    1087 	_SFXcontinue:
+   053B 78            [ 4] 1088 	ld	a,b ; restore byte
+   053C FE 40         [ 7] 1089 	cp	#0x40
+   053E DAr5Br05      [10] 1090 	jp	c,_SFXcommand ; if less than $40 then it is a command
+   0541 CB 67         [ 8] 1091 	bit	4,a ; check if it is a volume byte
+   0543 28 0C         [12] 1092 	jr	z,_SFXoutbyte ; if not, output it
+   0545 CB 6F         [ 8] 1093 	bit	5,a ; check if it is volume for channel 2 or channel 3
+   0547 20 05         [12] 1094 	jr	nz,_SFXvolumechn3
+   0549 32r17r00      [13] 1095 	ld	(_PSGSFXChan2Volume),a
+   054C 18 03         [12] 1096 	jr	_SFXoutbyte
+   054E                    1097 	_SFXvolumechn3:
+   054E 32r18r00      [13] 1098 	ld	(_PSGSFXChan3Volume),a
+   0551                    1099 	_SFXoutbyte:
+   0551 D3 7F         [11] 1100 	out	(#0x7f),a ; output the byte
+   0553 C3r2Ar05      [10] 1101 	jp	_intSFXLoop
+   0556                    1102 	_skipSFXFrame:
+   0556 3D            [ 4] 1103 	dec	a
+   0557 32r20r00      [13] 1104 	ld	(_PSGSFXSkipFrames),a
+   055A C9            [10] 1105 	ret
+   055B                    1106 	_SFXcommand:
+   055B FE 38         [ 7] 1107 	cp	#0x38
+   055D 28 07         [12] 1108 	jr	z,_SFXdone ; no additional frames
+   055F 38 09         [12] 1109 	jr	c,_SFXotherCommands ; other commands?
+   0561 E6 07         [ 7] 1110 	and	#0x07 ; take only the last 3 bits for skip frames
+   0563 32r20r00      [13] 1111 	ld	(_PSGSFXSkipFrames),a ; we got additional frames to skip
+   0566                    1112 	_SFXdone:
+   0566 22r1Cr00      [16] 1113 	ld	(_PSGSFXPointer),hl ; save current address
+   0569 C9            [10] 1114 	ret	; frame done
+   056A                    1115 	_SFXotherCommands:
+   056A FE 08         [ 7] 1116 	cp	#0x08
+   056C 30 1F         [12] 1117 	jr	nc,_SFXsubstring
+   056E FE 00         [ 7] 1118 	cp	#0x00
+   0570 28 0B         [12] 1119 	jr	z,_sfxLoop
+   0572 FE 01         [ 7] 1120 	cp	#0x01
+   0574 28 01         [12] 1121 	jr	z,_SFXsetLoopPoint
+                           1122 ;	***************************************************************************
+                           1123 ;	we should never get here!
+                           1124 ;	if we do, it means the PSG SFX file is probably corrupted, so we just RET
+                           1125 ;	***************************************************************************
+   0576 C9            [10] 1126 	ret
+   0577                    1127 	_SFXsetLoopPoint:
+   0577 22r1Er00      [16] 1128 	ld	(_PSGSFXLoopPoint),hl
+   057A C3r2Ar05      [10] 1129 	jp	_intSFXLoop
+   057D                    1130 	_sfxLoop:
+   057D 3Ar21r00      [13] 1131 	ld	a,(_PSGSFXLoopFlag) ; is it a looping SFX?
+   0580 B7            [ 4] 1132 	or	a
+   0581 CArBCr02      [10] 1133 	jp	z,_PSGSFXStop ; No:stop it! (tail call optimization)
+   0584 2Ar1Er00      [16] 1134 	ld	hl,(_PSGSFXLoopPoint)
+   0587 22r1Cr00      [16] 1135 	ld	(_PSGSFXPointer),hl
+   058A C3r2Ar05      [10] 1136 	jp	_intSFXLoop
+   058D                    1137 	_SFXsubstring:
+   058D D6 04         [ 7] 1138 	sub	#0x08 -4 ; len is value - $08 + 4
+   058F 32r22r00      [13] 1139 	ld	(_PSGSFXSubstringLen),a ; save len
+   0592 4E            [ 7] 1140 	ld	c,(hl) ; load substring address (offset)
+   0593 23            [ 6] 1141 	inc	hl
+   0594 46            [ 7] 1142 	ld	b,(hl)
+   0595 23            [ 6] 1143 	inc	hl
+   0596 22r23r00      [16] 1144 	ld	(_PSGSFXSubstringRetAddr),hl ; save return address
+   0599 2Ar1Ar00      [16] 1145 	ld	hl,(_PSGSFXStart)
+   059C 09            [11] 1146 	add	hl,bc ; make substring current
+   059D C3r2Ar05      [10] 1147 	jp	_intSFXLoop
+                           1148 ;PSGLib.c:551: }
+   05A0 C9            [10] 1149 	ret
+                           1150 	.area _CODE
+                           1151 	.area _INITIALIZER
+                           1152 	.area _CABS (ABS)

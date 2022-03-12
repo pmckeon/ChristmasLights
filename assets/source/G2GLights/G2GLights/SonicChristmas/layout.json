@@ -1,0 +1,10 @@
+{
+  "name": "Sonic Christmas",
+  "background": "background.png",
+  "channels": [
+    {"channel":0, "x": 20, "y": 20, "image": "light.png"},
+    {"channel":0, "x": 20, "y": 40, "image": "light.png"},
+    {"channel":1, "x": 80, "y": 20, "image": "light.png"},
+    {"channel":1, "x": 80, "y": 40, "image": "light.png"}
+  ]
+}

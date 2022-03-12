@@ -1,0 +1,39 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+    _G2G_IOPinPort                                              =  0001 
+    _G2G_NMIPort                                                =  0002 
+    _G2G_RxPort                                                 =  0004 
+    _G2G_StatusPort                                             =  0005 
+    _G2G_TxPort                                                 =  0003 
+  0 _IOFrame                                                       005C GR
+  1 _IOFrame_count_65536_12                                        0007 R
+  1 _IOFrame_frame_65536_12                                        0009 R
+  0 _IOPlay                                                        0000 GR
+  1 _IOPointer                                                     0003 GR
+  1 _IOSize                                                        0005 GR
+  1 _IOStart                                                       0001 GR
+  1 _IOStatus                                                      0000 GR
+  0 _IOStop                                                        002C GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  153   flags    0
+   1 _DATA                                      size    B   flags    0
+   2 _INITIALIZED                               size    0   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    B   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    0   flags    0
+   8 _CABS                                      size    0   flags    8
+

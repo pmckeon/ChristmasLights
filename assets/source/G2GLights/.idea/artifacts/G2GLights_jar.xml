@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="G2GLights:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/G2GLights_jar</output-path>
+    <root id="archive" name="G2GLights.jar">
+      <element id="module-output" name="G2GLights" />
+    </root>
+  </artifact>
+</component>

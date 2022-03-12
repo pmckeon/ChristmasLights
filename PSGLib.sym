@@ -1,0 +1,110 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+  0 _PSGCancelLoop                                                 00A0 GR
+  1 _PSGChan0Volume                                                000E GR
+  1 _PSGChan1Volume                                                000F GR
+  1 _PSGChan2HighTone                                              0013 GR
+  1 _PSGChan2LowTone                                               0012 GR
+  1 _PSGChan2Volume                                                0010 GR
+  1 _PSGChan3LowTone                                               0014 GR
+  1 _PSGChan3Volume                                                0011 GR
+  1 _PSGChannel2SFX                                                0015 GR
+  1 _PSGChannel3SFX                                                0016 GR
+  0 _PSGFrame                                                      0402 GR
+  0 _PSGGetStatus                                                  00B5 GR
+  1 _PSGLoopFlag                                                   0008 GR
+  1 _PSGMusicLastLatch                                             0009 GR
+  1 _PSGMusicLoopPoint                                             0005 GR
+  1 _PSGMusicPointer                                               0003 GR
+  1 _PSGMusicSkipFrames                                            0007 GR
+  1 _PSGMusicStart                                                 0001 GR
+  1 _PSGMusicStatus                                                0000 GR
+  1 _PSGMusicSubstringLen                                          000B GR
+  1 _PSGMusicSubstringRetAddr                                      000C GR
+  1 _PSGMusicVolumeAttenuation                                     000A GR
+  0 _PSGPlay                                                       0073 GR
+  0 _PSGPlayNoRepeat                                               00A6 GR
+    _PSGPort                                                    =  007F 
+  0 _PSGRestoreVolumes                                             00CE GR
+  0 _PSGResume                                                     0027 GR
+  0 _PSGSFXCancelLoop                                              03D3 GR
+  1 _PSGSFXChan2Volume                                             0017 GR
+  1 _PSGSFXChan3Volume                                             0018 GR
+  0 _PSGSFXFrame                                                   051B GR
+  0 _PSGSFXGetStatus                                               03D9 GR
+  1 _PSGSFXLoopFlag                                                0021 GR
+  1 _PSGSFXLoopPoint                                               001E GR
+  0 _PSGSFXPlay                                                    0386 GR
+  0 _PSGSFXPlayLoop                                                03E1 GR
+  1 _PSGSFXPointer                                                 001C GR
+  1 _PSGSFXSkipFrames                                              0020 GR
+  1 _PSGSFXStart                                                   001A GR
+  1 _PSGSFXStatus                                                  0019 GR
+  0 _PSGSFXStop                                                    02BC GR
+  1 _PSGSFXSubstringLen                                            0022 GR
+  1 _PSGSFXSubstringRetAddr                                        0023 GR
+  0 _PSGSetMusicVolumeAttenuation                                  01CD GR
+  0 _PSGSilenceChannels                                            00BD GR
+  0 _PSGStop                                                       0000 GR
+  0 _SFXcommand                                                    055B R
+  0 _SFXcontinue                                                   053B R
+  0 _SFXdone                                                       0566 R
+  0 _SFXotherCommands                                              056A R
+  0 _SFXoutbyte                                                    0551 R
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 2.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+  0 _SFXsetLoopPoint                                               0577 R
+  0 _SFXsubstring                                                  058D R
+  0 _SFXvolumechn3                                                 054E R
+  0 _chn0                                                          0474 R
+  0 _chn2                                                          048A R
+  0 _command                                                       04A5 R
+  0 _continue                                                      0422 R
+  0 _done                                                          04B0 R
+  0 _high_part_Tone                                                050D R
+  0 _ifchn2                                                        045A R
+  0 _intLoop                                                       0411 R
+  0 _intSFXLoop                                                    052A R
+  0 _latch_Volume                                                  0466 R
+  0 _latch_Volume_23                                               047A R
+  0 _musicLoop                                                     04ED R
+  0 _noLatch                                                       049B R
+  0 _no_overflow                                                   04D6 R
+  0 _otherCommands                                                 04B4 R
+  0 _output_NoLatch                                                04E0 R
+  0 _send2PSG_A                                                    04C2 R
+  0 _send2PSG_B                                                    04C1 R
+  0 _sendVolume2PSG_A                                              04C8 R
+  0 _sendVolume2PSG_B                                              04C7 R
+  0 _setLoopPoint                                                  04E7 R
+  0 _sfxLoop                                                       057D R
+  0 _skipFrame                                                     0496 R
+  0 _skipSFXFrame                                                  0556 R
+  0 _substring                                                     04FA R
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 3.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  5A1   flags    0
+   1 _DATA                                      size   25   flags    0
+   2 _INITIALIZED                               size    0   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    0   flags    0
+   8 _CABS                                      size    0   flags    8
+

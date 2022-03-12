@@ -1,0 +1,511 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 4.0.0 #11528 (MINGW64)
+                              4 ;--------------------------------------------------------
+                              5 	.module ChristmasLights
+                              6 	.optsdcc -mz80
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl ___SMS__SDSC_signature
+                             12 	.globl ___SMS__SDSC_descr
+                             13 	.globl ___SMS__SDSC_name
+                             14 	.globl ___SMS__SDSC_author
+                             15 	.globl ___SMS__SEGA_signature
+                             16 	.globl _main
+                             17 	.globl _putstring
+                             18 	.globl _IOFrame
+                             19 	.globl _IOStop
+                             20 	.globl _IOPlay
+                             21 	.globl _PSGFrame
+                             22 	.globl _PSGGetStatus
+                             23 	.globl _PSGStop
+                             24 	.globl _PSGPlayNoRepeat
+                             25 	.globl _SMS_VRAMmemcpy
+                             26 	.globl _SMS_getKeysPressed
+                             27 	.globl _GG_loadBGPalette
+                             28 	.globl _SMS_loadTileMapArea
+                             29 	.globl _SMS_crt0_RST18
+                             30 	.globl _SMS_crt0_RST08
+                             31 	.globl _SMS_waitForVBlank
+                             32 	.globl _SMS_VDPturnOnFeature
+                             33 	.globl _PlayListIndex
+                             34 	.globl _PlayList
+                             35 	.globl _framecount
+                             36 	.globl _SMS_SRAM
+                             37 	.globl _SRAM_bank_to_be_mapped_on_slot2
+                             38 	.globl _ROM_bank_to_be_mapped_on_slot2
+                             39 ;--------------------------------------------------------
+                             40 ; special function registers
+                             41 ;--------------------------------------------------------
+                     0001    42 _G2G_IOPinPort	=	0x0001
+                     0002    43 _G2G_NMIPort	=	0x0002
+                     0003    44 _G2G_TxPort	=	0x0003
+                     0004    45 _G2G_RxPort	=	0x0004
+                     0005    46 _G2G_StatusPort	=	0x0005
+                             47 ;--------------------------------------------------------
+                             48 ; ram data
+                             49 ;--------------------------------------------------------
+                             50 	.area _DATA
+                     FFFF    51 _ROM_bank_to_be_mapped_on_slot2	=	0xffff
+                     FFFC    52 _SRAM_bank_to_be_mapped_on_slot2	=	0xfffc
+                     8000    53 _SMS_SRAM	=	0x8000
+                             54 ;--------------------------------------------------------
+                             55 ; ram data
+                             56 ;--------------------------------------------------------
+                             57 	.area _INITIALIZED
+   0000                      58 _framecount::
+   0000                      59 	.ds 2
+   0002                      60 _PlayList::
+   0002                      61 	.ds 27
+   001D                      62 _PlayListIndex::
+   001D                      63 	.ds 2
+                             64 ;--------------------------------------------------------
+                             65 ; absolute external ram data
+                             66 ;--------------------------------------------------------
+                             67 	.area _DABS (ABS)
+                             68 ;--------------------------------------------------------
+                             69 ; global & static initialisations
+                             70 ;--------------------------------------------------------
+                             71 	.area _HOME
+                             72 	.area _GSINIT
+                             73 	.area _GSFINAL
+                             74 	.area _GSINIT
+                             75 ;--------------------------------------------------------
+                             76 ; Home
+                             77 ;--------------------------------------------------------
+                             78 	.area _HOME
+                             79 	.area _HOME
+                             80 ;--------------------------------------------------------
+                             81 ; code
+                             82 ;--------------------------------------------------------
+                             83 	.area _CODE
+                             84 ;ChristmasLights.c:10: void putstring(uint8_t x, uint8_t y, const char* string)
+                             85 ;	---------------------------------
+                             86 ; Function putstring
+                             87 ; ---------------------------------
+   0000                      88 _putstring::
+   0000 DD E5         [15]   89 	push	ix
+   0002 DD 21 00 00   [14]   90 	ld	ix,#0
+   0006 DD 39         [15]   91 	add	ix,sp
+                             92 ;ChristmasLights.c:12: SMS_setNextTileatXY(x, y);
+   0008 DD 6E 05      [19]   93 	ld	l, 5 (ix)
+   000B 26 00         [ 7]   94 	ld	h, #0x00
+   000D 29            [11]   95 	add	hl, hl
+   000E 29            [11]   96 	add	hl, hl
+   000F 29            [11]   97 	add	hl, hl
+   0010 29            [11]   98 	add	hl, hl
+   0011 29            [11]   99 	add	hl, hl
+   0012 DD 4E 04      [19]  100 	ld	c, 4 (ix)
+   0015 06 00         [ 7]  101 	ld	b, #0x00
+   0017 09            [11]  102 	add	hl, bc
+   0018 29            [11]  103 	add	hl, hl
+   0019 7C            [ 4]  104 	ld	a, h
+   001A F6 78         [ 7]  105 	or	a, #0x78
+   001C 67            [ 4]  106 	ld	h, a
+   001D CDr00r00      [17]  107 	call	_SMS_crt0_RST08
+                            108 ;ChristmasLights.c:13: while (*string)
+   0020 DD 4E 06      [19]  109 	ld	c, 6 (ix)
+   0023 DD 46 07      [19]  110 	ld	b, 7 (ix)
+   0026                     111 00101$:
+   0026 0A            [ 7]  112 	ld	a, (bc)
+   0027 B7            [ 4]  113 	or	a, a
+   0028 28 0D         [12]  114 	jr	Z,00104$
+                            115 ;ChristmasLights.c:15: SMS_setTile(*string++ + STRING_OFFSET);
+   002A 03            [ 6]  116 	inc	bc
+   002B 5F            [ 4]  117 	ld	e, a
+   002C 16 00         [ 7]  118 	ld	d, #0x00
+   002E 21 E0 FF      [10]  119 	ld	hl, #0xffe0
+   0031 19            [11]  120 	add	hl, de
+   0032 CDr00r00      [17]  121 	call	_SMS_crt0_RST18
+   0035 18 EF         [12]  122 	jr	00101$
+   0037                     123 00104$:
+                            124 ;ChristmasLights.c:17: }
+   0037 DD E1         [14]  125 	pop	ix
+   0039 C9            [10]  126 	ret
+                            127 ;ChristmasLights.c:38: void main(void)
+                            128 ;	---------------------------------
+                            129 ; Function main
+                            130 ; ---------------------------------
+   003A                     131 _main::
+   003A DD E5         [15]  132 	push	ix
+   003C DD 21 00 00   [14]  133 	ld	ix,#0
+   0040 DD 39         [15]  134 	add	ix,sp
+   0042 21 57 FF      [10]  135 	ld	hl, #-169
+   0045 39            [11]  136 	add	hl, sp
+   0046 F9            [ 6]  137 	ld	sp, hl
+                            138 ;ChristmasLights.c:42: bool songidle = 1;
+   0047 DD 36 FF 01   [19]  139 	ld	-1 (ix), #0x01
+                            140 ;ChristmasLights.c:44: IOStop();
+   004B CDr00r00      [17]  141 	call	_IOStop
+                            142 ;ChristmasLights.c:48: SMS_mapROMBank(2);
+   004E 21 FF FF      [10]  143 	ld	hl,#_ROM_bank_to_be_mapped_on_slot2 + 0
+   0051 36 02         [10]  144 	ld	(hl), #0x02
+                            145 ;ChristmasLights.c:49: GG_loadBGPalette (Yule__palette__bin);
+   0053 21r00r00      [10]  146 	ld	hl, #_Yule__palette__bin
+   0056 CDr00r00      [17]  147 	call	_GG_loadBGPalette
+                            148 ;ChristmasLights.c:50: SMS_loadTiles (fire__tiles__bin, 297, fire__tiles__bin_size);
+   0059 21 C0 00      [10]  149 	ld	hl, #0x00c0
+   005C E5            [11]  150 	push	hl
+   005D 21r00r00      [10]  151 	ld	hl, #_fire__tiles__bin
+   0060 E5            [11]  152 	push	hl
+   0061 21 20 65      [10]  153 	ld	hl, #0x6520
+   0064 E5            [11]  154 	push	hl
+   0065 CDr00r00      [17]  155 	call	_SMS_VRAMmemcpy
+                            156 ;ChristmasLights.c:51: SMS_loadTileMapArea (6, 3, Yule__tilemap__bin, 20, 18);
+   0068 11 14 12      [10]  157 	ld	de, #0x1214
+   006B D5            [11]  158 	push	de
+   006C 21r00r00      [10]  159 	ld	hl, #_Yule__tilemap__bin
+   006F E5            [11]  160 	push	hl
+   0070 11 06 03      [10]  161 	ld	de, #0x0306
+   0073 D5            [11]  162 	push	de
+   0074 CDr00r00      [17]  163 	call	_SMS_loadTileMapArea
+   0077 21 06 00      [10]  164 	ld	hl, #6
+   007A 39            [11]  165 	add	hl, sp
+   007B F9            [ 6]  166 	ld	sp, hl
+                            167 ;ChristmasLights.c:52: SMS_mapROMBank(4);
+   007C 21 FF FF      [10]  168 	ld	hl,#_ROM_bank_to_be_mapped_on_slot2 + 0
+   007F 36 04         [10]  169 	ld	(hl), #0x04
+                            170 ;ChristmasLights.c:53: SMS_loadTiles (Yule__tiles__bin, 0, Yule__tiles__bin_size);
+   0081 21 20 25      [10]  171 	ld	hl, #0x2520
+   0084 E5            [11]  172 	push	hl
+   0085 21r00r00      [10]  173 	ld	hl, #_Yule__tiles__bin
+   0088 E5            [11]  174 	push	hl
+   0089 21 00 40      [10]  175 	ld	hl, #0x4000
+   008C E5            [11]  176 	push	hl
+   008D CDr00r00      [17]  177 	call	_SMS_VRAMmemcpy
+                            178 ;ChristmasLights.c:54: SMS_displayOn();
+   0090 21 40 01      [10]  179 	ld	hl, #0x0140
+   0093 CDr00r00      [17]  180 	call	_SMS_VDPturnOnFeature
+   0096                     181 00121$:
+                            182 ;ChristmasLights.c:58: SMS_waitForVBlank();
+   0096 CDr00r00      [17]  183 	call	_SMS_waitForVBlank
+                            184 ;ChristmasLights.c:60: keyPress = SMS_getKeysPressed();
+   0099 CDr00r00      [17]  185 	call	_SMS_getKeysPressed
+                            186 ;ChristmasLights.c:61: if (keyPress & GG_KEY_START)
+   009C 29            [11]  187 	add	hl, hl
+   009D 30 68         [12]  188 	jr	NC,00105$
+                            189 ;ChristmasLights.c:63: if(songidle)
+   009F DD CB FF 46   [20]  190 	bit	0, -1 (ix)
+   00A3 28 58         [12]  191 	jr	Z,00102$
+                            192 ;ChristmasLights.c:65: SMS_mapROMBank(PlayList[PlayListIndex].songbank);
+   00A5 ED 4Br1Dr00   [20]  193 	ld	bc, (_PlayListIndex)
+   00A9 69            [ 4]  194 	ld	l, c
+   00AA 60            [ 4]  195 	ld	h, b
+   00AB 29            [11]  196 	add	hl, hl
+   00AC 29            [11]  197 	add	hl, hl
+   00AD 29            [11]  198 	add	hl, hl
+   00AE 09            [11]  199 	add	hl, bc
+   00AF EB            [ 4]  200 	ex	de, hl
+   00B0 21r02r00      [10]  201 	ld	hl, #_PlayList
+   00B3 19            [11]  202 	add	hl, de
+   00B4 EB            [ 4]  203 	ex	de, hl
+   00B5 6B            [ 4]  204 	ld	l, e
+   00B6 62            [ 4]  205 	ld	h, d
+   00B7 23            [ 6]  206 	inc	hl
+   00B8 23            [ 6]  207 	inc	hl
+   00B9 7E            [ 7]  208 	ld	a, (hl)
+   00BA 32 FF FF      [13]  209 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            210 ;ChristmasLights.c:66: PSGPlayNoRepeat(PlayList[PlayListIndex].song);
+   00BD EB            [ 4]  211 	ex	de,hl
+   00BE 4E            [ 7]  212 	ld	c, (hl)
+   00BF 23            [ 6]  213 	inc	hl
+   00C0 46            [ 7]  214 	ld	b, (hl)
+   00C1 C5            [11]  215 	push	bc
+   00C2 CDr00r00      [17]  216 	call	_PSGPlayNoRepeat
+   00C5 F1            [10]  217 	pop	af
+                            218 ;ChristmasLights.c:67: SMS_mapROMBank(PlayList[PlayListIndex].eventbank);
+   00C6 ED 4Br1Dr00   [20]  219 	ld	bc, (_PlayListIndex)
+   00CA 69            [ 4]  220 	ld	l, c
+   00CB 60            [ 4]  221 	ld	h, b
+   00CC 29            [11]  222 	add	hl, hl
+   00CD 29            [11]  223 	add	hl, hl
+   00CE 29            [11]  224 	add	hl, hl
+   00CF 09            [11]  225 	add	hl, bc
+   00D0 EB            [ 4]  226 	ex	de, hl
+   00D1 21r02r00      [10]  227 	ld	hl, #_PlayList
+   00D4 19            [11]  228 	add	hl, de
+   00D5 EB            [ 4]  229 	ex	de, hl
+   00D6 6B            [ 4]  230 	ld	l, e
+   00D7 62            [ 4]  231 	ld	h, d
+   00D8 01 07 00      [10]  232 	ld	bc, #0x0007
+   00DB 09            [11]  233 	add	hl, bc
+   00DC 7E            [ 7]  234 	ld	a, (hl)
+   00DD 32 FF FF      [13]  235 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            236 ;ChristmasLights.c:68: IOPlay(PlayList[PlayListIndex].event, PlayList[PlayListIndex].eventsize);
+   00E0 6B            [ 4]  237 	ld	l, e
+   00E1 62            [ 4]  238 	ld	h, d
+   00E2 01 05 00      [10]  239 	ld	bc, #0x0005
+   00E5 09            [11]  240 	add	hl, bc
+   00E6 4E            [ 7]  241 	ld	c, (hl)
+   00E7 23            [ 6]  242 	inc	hl
+   00E8 46            [ 7]  243 	ld	b, (hl)
+   00E9 EB            [ 4]  244 	ex	de,hl
+   00EA 23            [ 6]  245 	inc	hl
+   00EB 23            [ 6]  246 	inc	hl
+   00EC 23            [ 6]  247 	inc	hl
+   00ED 5E            [ 7]  248 	ld	e, (hl)
+   00EE 23            [ 6]  249 	inc	hl
+   00EF 56            [ 7]  250 	ld	d, (hl)
+   00F0 C5            [11]  251 	push	bc
+   00F1 D5            [11]  252 	push	de
+   00F2 CDr00r00      [17]  253 	call	_IOPlay
+   00F5 F1            [10]  254 	pop	af
+   00F6 F1            [10]  255 	pop	af
+                            256 ;ChristmasLights.c:69: songidle = 0;
+   00F7 AF            [ 4]  257 	xor	a, a
+   00F8 DD 77 FF      [19]  258 	ld	-1 (ix), a
+   00FB 18 0A         [12]  259 	jr	00105$
+   00FD                     260 00102$:
+                            261 ;ChristmasLights.c:73: songidle = 1;
+   00FD DD 36 FF 01   [19]  262 	ld	-1 (ix), #0x01
+                            263 ;ChristmasLights.c:74: PSGStop();
+   0101 CDr00r00      [17]  264 	call	_PSGStop
+                            265 ;ChristmasLights.c:75: IOStop();
+   0104 CDr00r00      [17]  266 	call	_IOStop
+   0107                     267 00105$:
+                            268 ;ChristmasLights.c:79: if(PSGGetStatus() == PSG_STOPPED && !songidle)
+   0107 CDr00r00      [17]  269 	call	_PSGGetStatus
+   010A 7D            [ 4]  270 	ld	a, l
+   010B B7            [ 4]  271 	or	a, a
+   010C C2r8Ar01      [10]  272 	jp	NZ, 00133$
+   010F DD CB FF 46   [20]  273 	bit	0, -1 (ix)
+   0113 20 75         [12]  274 	jr	NZ,00133$
+                            275 ;ChristmasLights.c:81: PlayListIndex++;
+   0115 2Ar1Dr00      [16]  276 	ld	hl, (_PlayListIndex)
+   0118 23            [ 6]  277 	inc	hl
+   0119 22r1Dr00      [16]  278 	ld	(_PlayListIndex), hl
+                            279 ;ChristmasLights.c:82: if(PlayListIndex >= MAX_PLAYLIST_ITEMS)
+   011C FD 21r1Dr00   [14]  280 	ld	iy, #_PlayListIndex
+   0120 FD 7E 00      [19]  281 	ld	a, 0 (iy)
+   0123 D6 03         [ 7]  282 	sub	a, #0x03
+   0125 FD 7E 01      [19]  283 	ld	a, 1 (iy)
+   0128 DE 00         [ 7]  284 	sbc	a, #0x00
+   012A 38 0C         [12]  285 	jr	C,00107$
+                            286 ;ChristmasLights.c:84: PlayListIndex = 0;
+   012C 21 00 00      [10]  287 	ld	hl, #0x0000
+   012F 22r1Dr00      [16]  288 	ld	(_PlayListIndex), hl
+                            289 ;ChristmasLights.c:86: IOStop();
+   0132 CDr00r00      [17]  290 	call	_IOStop
+                            291 ;ChristmasLights.c:87: return;
+   0135 C3rDFr01      [10]  292 	jp	00123$
+   0138                     293 00107$:
+                            294 ;ChristmasLights.c:91: SMS_mapROMBank(PlayList[PlayListIndex].songbank);
+   0138 ED 4Br1Dr00   [20]  295 	ld	bc, (_PlayListIndex)
+   013C 69            [ 4]  296 	ld	l, c
+   013D 60            [ 4]  297 	ld	h, b
+   013E 29            [11]  298 	add	hl, hl
+   013F 29            [11]  299 	add	hl, hl
+   0140 29            [11]  300 	add	hl, hl
+   0141 09            [11]  301 	add	hl, bc
+   0142 EB            [ 4]  302 	ex	de, hl
+   0143 21r02r00      [10]  303 	ld	hl, #_PlayList
+   0146 19            [11]  304 	add	hl, de
+   0147 EB            [ 4]  305 	ex	de, hl
+   0148 6B            [ 4]  306 	ld	l, e
+   0149 62            [ 4]  307 	ld	h, d
+   014A 23            [ 6]  308 	inc	hl
+   014B 23            [ 6]  309 	inc	hl
+   014C 7E            [ 7]  310 	ld	a, (hl)
+   014D 32 FF FF      [13]  311 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            312 ;ChristmasLights.c:92: PSGPlayNoRepeat(PlayList[PlayListIndex].song);
+   0150 EB            [ 4]  313 	ex	de,hl
+   0151 4E            [ 7]  314 	ld	c, (hl)
+   0152 23            [ 6]  315 	inc	hl
+   0153 46            [ 7]  316 	ld	b, (hl)
+   0154 C5            [11]  317 	push	bc
+   0155 CDr00r00      [17]  318 	call	_PSGPlayNoRepeat
+   0158 F1            [10]  319 	pop	af
+                            320 ;ChristmasLights.c:93: SMS_mapROMBank(PlayList[PlayListIndex].eventbank);
+   0159 ED 4Br1Dr00   [20]  321 	ld	bc, (_PlayListIndex)
+   015D 69            [ 4]  322 	ld	l, c
+   015E 60            [ 4]  323 	ld	h, b
+   015F 29            [11]  324 	add	hl, hl
+   0160 29            [11]  325 	add	hl, hl
+   0161 29            [11]  326 	add	hl, hl
+   0162 09            [11]  327 	add	hl, bc
+   0163 EB            [ 4]  328 	ex	de, hl
+   0164 21r02r00      [10]  329 	ld	hl, #_PlayList
+   0167 19            [11]  330 	add	hl, de
+   0168 EB            [ 4]  331 	ex	de, hl
+   0169 6B            [ 4]  332 	ld	l, e
+   016A 62            [ 4]  333 	ld	h, d
+   016B 01 07 00      [10]  334 	ld	bc, #0x0007
+   016E 09            [11]  335 	add	hl, bc
+   016F 7E            [ 7]  336 	ld	a, (hl)
+   0170 32 FF FF      [13]  337 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            338 ;ChristmasLights.c:94: IOPlay(PlayList[PlayListIndex].event, PlayList[PlayListIndex].eventsize);
+   0173 6B            [ 4]  339 	ld	l, e
+   0174 62            [ 4]  340 	ld	h, d
+   0175 01 05 00      [10]  341 	ld	bc, #0x0005
+   0178 09            [11]  342 	add	hl, bc
+   0179 4E            [ 7]  343 	ld	c, (hl)
+   017A 23            [ 6]  344 	inc	hl
+   017B 46            [ 7]  345 	ld	b, (hl)
+   017C EB            [ 4]  346 	ex	de,hl
+   017D 23            [ 6]  347 	inc	hl
+   017E 23            [ 6]  348 	inc	hl
+   017F 23            [ 6]  349 	inc	hl
+   0180 5E            [ 7]  350 	ld	e, (hl)
+   0181 23            [ 6]  351 	inc	hl
+   0182 56            [ 7]  352 	ld	d, (hl)
+   0183 C5            [11]  353 	push	bc
+   0184 D5            [11]  354 	push	de
+   0185 CDr00r00      [17]  355 	call	_IOPlay
+   0188 F1            [10]  356 	pop	af
+   0189 F1            [10]  357 	pop	af
+                            358 ;ChristmasLights.c:98: for(int y=0;y<6;y++)
+   018A                     359 00133$:
+   018A 01 00 00      [10]  360 	ld	bc, #0x0000
+   018D                     361 00119$:
+   018D 79            [ 4]  362 	ld	a, c
+   018E D6 06         [ 7]  363 	sub	a, #0x06
+   0190 78            [ 4]  364 	ld	a, b
+   0191 17            [ 4]  365 	rla
+   0192 3F            [ 4]  366 	ccf
+   0193 1F            [ 4]  367 	rra
+   0194 DE 80         [ 7]  368 	sbc	a, #0x80
+   0196 30 14         [12]  369 	jr	NC,00113$
+                            370 ;ChristmasLights.c:100: for(int x=0;x<14;x++)
+   0198 11 00 00      [10]  371 	ld	de, #0x0000
+   019B                     372 00116$:
+   019B 7B            [ 4]  373 	ld	a, e
+   019C D6 0E         [ 7]  374 	sub	a, #0x0e
+   019E 7A            [ 4]  375 	ld	a, d
+   019F 17            [ 4]  376 	rla
+   01A0 3F            [ 4]  377 	ccf
+   01A1 1F            [ 4]  378 	rra
+   01A2 DE 80         [ 7]  379 	sbc	a, #0x80
+   01A4 30 03         [12]  380 	jr	NC,00120$
+   01A6 13            [ 6]  381 	inc	de
+   01A7 18 F2         [12]  382 	jr	00116$
+   01A9                     383 00120$:
+                            384 ;ChristmasLights.c:98: for(int y=0;y<6;y++)
+   01A9 03            [ 6]  385 	inc	bc
+   01AA 18 E1         [12]  386 	jr	00119$
+   01AC                     387 00113$:
+                            388 ;ChristmasLights.c:125: SMS_mapROMBank(PlayList[PlayListIndex].eventbank);
+   01AC ED 4Br1Dr00   [20]  389 	ld	bc, (_PlayListIndex)
+   01B0 69            [ 4]  390 	ld	l, c
+   01B1 60            [ 4]  391 	ld	h, b
+   01B2 29            [11]  392 	add	hl, hl
+   01B3 29            [11]  393 	add	hl, hl
+   01B4 29            [11]  394 	add	hl, hl
+   01B5 09            [11]  395 	add	hl, bc
+   01B6 11r02r00      [10]  396 	ld	de, #_PlayList
+   01B9 19            [11]  397 	add	hl, de
+   01BA 11 07 00      [10]  398 	ld	de, #0x0007
+   01BD 19            [11]  399 	add	hl, de
+   01BE 7E            [ 7]  400 	ld	a, (hl)
+   01BF 32 FF FF      [13]  401 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            402 ;ChristmasLights.c:126: IOFrame();
+   01C2 CDr00r00      [17]  403 	call	_IOFrame
+                            404 ;ChristmasLights.c:127: SMS_mapROMBank(PlayList[PlayListIndex].songbank);
+   01C5 ED 4Br1Dr00   [20]  405 	ld	bc, (_PlayListIndex)
+   01C9 69            [ 4]  406 	ld	l, c
+   01CA 60            [ 4]  407 	ld	h, b
+   01CB 29            [11]  408 	add	hl, hl
+   01CC 29            [11]  409 	add	hl, hl
+   01CD 29            [11]  410 	add	hl, hl
+   01CE 09            [11]  411 	add	hl, bc
+   01CF 11r02r00      [10]  412 	ld	de, #_PlayList
+   01D2 19            [11]  413 	add	hl, de
+   01D3 23            [ 6]  414 	inc	hl
+   01D4 23            [ 6]  415 	inc	hl
+   01D5 7E            [ 7]  416 	ld	a, (hl)
+   01D6 32 FF FF      [13]  417 	ld	(_ROM_bank_to_be_mapped_on_slot2+0), a
+                            418 ;ChristmasLights.c:128: PSGFrame();
+   01D9 CDr00r00      [17]  419 	call	_PSGFrame
+   01DC C3r96r00      [10]  420 	jp	00121$
+   01DF                     421 00123$:
+                            422 ;ChristmasLights.c:130: }
+   01DF DD F9         [10]  423 	ld	sp, ix
+   01E1 DD E1         [14]  424 	pop	ix
+   01E3 C9            [10]  425 	ret
+                            426 	.area _CODE
+   01E4                     427 __str_0:
+   01E4 74 68 61 74 61 77   428 	.ascii "thatawesomeguy"
+        65 73 6F 6D 65 67
+        75 79
+   01F2 00                  429 	.db 0x00
+   01F3                     430 __str_1:
+   01F3 43 68 72 69 73 74   431 	.ascii "Christmas Lights"
+        6D 61 73 20 4C 69
+        67 68 74 73
+   0203 00                  432 	.db 0x00
+   0204                     433 __str_2:
+   0204 00                  434 	.db 0x00
+                            435 	.area _INITIALIZER
+   0000                     436 __xinit__framecount:
+   0000 00 00               437 	.dw #0x0000
+   0002                     438 __xinit__PlayList:
+   0002r00r00               439 	.dw _CarolSpirits_psg
+   0004 02                  440 	.db #0x02	; 2
+   0005r00r00               441 	.dw _CarolSpirits_Events_bin
+   0007 80 11               442 	.dw #0x1180
+   0009 04 00               443 	.dw #0x0004
+   000Br00r00               444 	.dw _A_Very_Sega_Master_System_Christmas_psg
+   000D 03                  445 	.db #0x03	; 3
+   000Er00r00               446 	.dw _A_Very_Sega_Master_System_Christmas_Events_bin
+   0010 3A 13               447 	.dw #0x133a
+   0012 03 00               448 	.dw #0x0003
+   0014r00r00               449 	.dw _A_Very_Sega_Master_System_Christmas_psg
+   0016 03                  450 	.db #0x03	; 3
+   0017r00r00               451 	.dw _A_Very_Sega_Master_System_Christmas_Events_bin
+   0019 3A 13               452 	.dw #0x133a
+   001B 03 00               453 	.dw #0x0003
+   001D                     454 __xinit__PlayListIndex:
+   001D 00 00               455 	.dw #0x0000
+                            456 	.area _CABS (ABS)
+   3FF0                     457 	.org 0x3FF0
+   3FF0                     458 ___SMS__SEGA_signature:
+   3FF0 54                  459 	.db #0x54	; 84	'T'
+   3FF1 4D                  460 	.db #0x4d	; 77	'M'
+   3FF2 52                  461 	.db #0x52	; 82	'R'
+   3FF3 20                  462 	.db #0x20	; 32
+   3FF4 53                  463 	.db #0x53	; 83	'S'
+   3FF5 45                  464 	.db #0x45	; 69	'E'
+   3FF6 47                  465 	.db #0x47	; 71	'G'
+   3FF7 41                  466 	.db #0x41	; 65	'A'
+   3FF8 FF                  467 	.db #0xff	; 255
+   3FF9 FF                  468 	.db #0xff	; 255
+   3FFA FF                  469 	.db #0xff	; 255
+   3FFB FF                  470 	.db #0xff	; 255
+   3FFC 01                  471 	.db #0x01	; 1
+   3FFD 00                  472 	.db #0x00	; 0
+   3FFE 00                  473 	.db #0x00	; 0
+   3FFF 7B                  474 	.db #0x7b	; 123
+   3FD1                     475 	.org 0x3FD1
+   3FD1                     476 ___SMS__SDSC_author:
+   3FD1 74 68 61 74 61 77   477 	.ascii "thatawesomeguy"
+        65 73 6F 6D 65 67
+        75 79
+   3FDF 00                  478 	.db 0x00
+   3FC0                     479 	.org 0x3FC0
+   3FC0                     480 ___SMS__SDSC_name:
+   3FC0 43 68 72 69 73 74   481 	.ascii "Christmas Lights"
+        6D 61 73 20 4C 69
+        67 68 74 73
+   3FD0 00                  482 	.db 0x00
+   3FBF                     483 	.org 0x3FBF
+   3FBF                     484 ___SMS__SDSC_descr:
+   3FBF 00                  485 	.db 0x00
+   3FE0                     486 	.org 0x3FE0
+   3FE0                     487 ___SMS__SDSC_signature:
+   3FE0 53                  488 	.db #0x53	; 83	'S'
+   3FE1 44                  489 	.db #0x44	; 68	'D'
+   3FE2 53                  490 	.db #0x53	; 83	'S'
+   3FE3 43                  491 	.db #0x43	; 67	'C'
+   3FE4 01                  492 	.db #0x01	; 1
+   3FE5 00                  493 	.db #0x00	; 0
+   3FE6 00                  494 	.db #0x00	; 0
+   3FE7 00                  495 	.db #0x00	; 0
+   3FE8 00                  496 	.db #0x00	; 0
+   3FE9 00                  497 	.db #0x00	; 0
+   3FEA D1                  498 	.db #0xd1	; 209
+   3FEB 3F                  499 	.db #0x3f	; 63
+   3FEC C0                  500 	.db #0xc0	; 192
+   3FED 3F                  501 	.db #0x3f	; 63
+   3FEE BF                  502 	.db #0xbf	; 191
+   3FEF 3F                  503 	.db #0x3f	; 63

@@ -1,0 +1,310 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 4.0.0 #11528 (MINGW64)
+                              4 ;--------------------------------------------------------
+                              5 	.module IOLib
+                              6 	.optsdcc -mz80
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _IOSize
+                             12 	.globl _IOPointer
+                             13 	.globl _IOStart
+                             14 	.globl _IOStatus
+                             15 	.globl _IOPlay
+                             16 	.globl _IOStop
+                             17 	.globl _IOFrame
+                             18 ;--------------------------------------------------------
+                             19 ; special function registers
+                             20 ;--------------------------------------------------------
+                     0001    21 _G2G_IOPinPort	=	0x0001
+                     0002    22 _G2G_NMIPort	=	0x0002
+                     0003    23 _G2G_TxPort	=	0x0003
+                     0004    24 _G2G_RxPort	=	0x0004
+                     0005    25 _G2G_StatusPort	=	0x0005
+                             26 ;--------------------------------------------------------
+                             27 ; ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area _DATA
+   0000                      30 _IOStatus::
+   0000                      31 	.ds 1
+   0001                      32 _IOStart::
+   0001                      33 	.ds 2
+   0003                      34 _IOPointer::
+   0003                      35 	.ds 2
+   0005                      36 _IOSize::
+   0005                      37 	.ds 2
+   0007                      38 _IOFrame_count_65536_12:
+   0007                      39 	.ds 2
+   0009                      40 _IOFrame_frame_65536_12:
+   0009                      41 	.ds 2
+                             42 ;--------------------------------------------------------
+                             43 ; ram data
+                             44 ;--------------------------------------------------------
+                             45 	.area _INITIALIZED
+                             46 ;--------------------------------------------------------
+                             47 ; absolute external ram data
+                             48 ;--------------------------------------------------------
+                             49 	.area _DABS (ABS)
+                             50 ;--------------------------------------------------------
+                             51 ; global & static initialisations
+                             52 ;--------------------------------------------------------
+                             53 	.area _HOME
+                             54 	.area _GSINIT
+                             55 	.area _GSFINAL
+                             56 	.area _GSINIT
+                             57 ;IOLib.c:47: static int count = 0;
+   0000 21 00 00      [10]   58 	ld	hl, #0x0000
+   0003 22r07r00      [16]   59 	ld	(_IOFrame_count_65536_12), hl
+                             60 ;IOLib.c:48: static int frame = 0;
+   0006 2E 00         [ 7]   61 	ld	l, #0x00
+   0008 22r09r00      [16]   62 	ld	(_IOFrame_frame_65536_12), hl
+                             63 ;--------------------------------------------------------
+                             64 ; Home
+                             65 ;--------------------------------------------------------
+                             66 	.area _HOME
+                             67 	.area _HOME
+                             68 ;--------------------------------------------------------
+                             69 ; code
+                             70 ;--------------------------------------------------------
+                             71 	.area _CODE
+                             72 ;IOLib.c:11: void IOPlay(unsigned char *IOData, unsigned int size)
+                             73 ;	---------------------------------
+                             74 ; Function IOPlay
+                             75 ; ---------------------------------
+   0000                      76 _IOPlay::
+                             77 ;IOLib.c:13: G2G_NMIPort = 0x80;
+   0000 3E 80         [ 7]   78 	ld	a, #0x80
+   0002 D3 02         [11]   79 	out	(_G2G_NMIPort), a
+                             80 ;IOLib.c:14: G2G_IOPinPort = 0x00;
+   0004 3E 00         [ 7]   81 	ld	a, #0x00
+   0006 D3 01         [11]   82 	out	(_G2G_IOPinPort), a
+                             83 ;IOLib.c:15: IOStart = IOData;
+   0008 D1            [10]   84 	pop	de
+   0009 C1            [10]   85 	pop	bc
+   000A C5            [11]   86 	push	bc
+   000B D5            [11]   87 	push	de
+   000C ED 43r01r00   [20]   88 	ld	(_IOStart), bc
+                             89 ;IOLib.c:16: IOPointer = IOData;
+   0010 ED 43r03r00   [20]   90 	ld	(_IOPointer), bc
+                             91 ;IOLib.c:17: IOSize = size;
+   0014 FD 21 04 00   [14]   92 	ld	iy, #4
+   0018 FD 39         [15]   93 	add	iy, sp
+   001A FD 7E 00      [19]   94 	ld	a, 0 (iy)
+   001D 32r05r00      [13]   95 	ld	(_IOSize+0), a
+   0020 FD 7E 01      [19]   96 	ld	a, 1 (iy)
+   0023 32r06r00      [13]   97 	ld	(_IOSize+1), a
+                             98 ;IOLib.c:18: IOStatus=IO_PLAYING;
+   0026 21r00r00      [10]   99 	ld	hl,#_IOStatus + 0
+   0029 36 01         [10]  100 	ld	(hl), #0x01
+                            101 ;IOLib.c:19: }
+   002B C9            [10]  102 	ret
+                            103 ;IOLib.c:21: void IOStop(void)
+                            104 ;	---------------------------------
+                            105 ; Function IOStop
+                            106 ; ---------------------------------
+   002C                     107 _IOStop::
+                            108 ;IOLib.c:23: G2G_NMIPort = 0x80;
+   002C 3E 80         [ 7]  109 	ld	a, #0x80
+   002E D3 02         [11]  110 	out	(_G2G_NMIPort), a
+                            111 ;IOLib.c:24: G2G_IOPinPort = 0x00;
+   0030 3E 00         [ 7]  112 	ld	a, #0x00
+   0032 D3 01         [11]  113 	out	(_G2G_IOPinPort), a
+                            114 ;IOLib.c:27: for(int i=7;i>=0;i--)
+   0034 11 07 00      [10]  115 	ld	de, #0x0007
+   0037                     116 00103$:
+   0037 CB 7A         [ 8]  117 	bit	7, d
+   0039 20 12         [12]  118 	jr	NZ,00101$
+                            119 ;IOLib.c:30: G2G_IOPinPort = byte;
+   003B 3E 00         [ 7]  120 	ld	a, #0x00
+   003D D3 01         [11]  121 	out	(_G2G_IOPinPort), a
+                            122 ;IOLib.c:32: G2G_IOPinPort = byte;
+   003F 3E 01         [ 7]  123 	ld	a, #0x01
+   0041 D3 01         [11]  124 	out	(_G2G_IOPinPort), a
+                            125 ;IOLib.c:33: byte &= 0xFE;
+   0043 01 00 00      [10]  126 	ld	bc, #0x0000
+                            127 ;IOLib.c:34: G2G_IOPinPort = byte;
+   0046 3E 00         [ 7]  128 	ld	a, #0x00
+   0048 D3 01         [11]  129 	out	(_G2G_IOPinPort), a
+                            130 ;IOLib.c:27: for(int i=7;i>=0;i--)
+   004A 1B            [ 6]  131 	dec	de
+   004B 18 EA         [12]  132 	jr	00103$
+   004D                     133 00101$:
+                            134 ;IOLib.c:36: byte |= 1 << 1;
+   004D CB C9         [ 8]  135 	set	1, c
+                            136 ;IOLib.c:37: G2G_IOPinPort = byte;
+   004F 79            [ 4]  137 	ld	a, c
+   0050 D3 01         [11]  138 	out	(_G2G_IOPinPort), a
+                            139 ;IOLib.c:39: G2G_IOPinPort = byte;
+   0052 3E 00         [ 7]  140 	ld	a, #0x00
+   0054 D3 01         [11]  141 	out	(_G2G_IOPinPort), a
+                            142 ;IOLib.c:41: IOStatus = IO_STOPPED;
+   0056 21r00r00      [10]  143 	ld	hl,#_IOStatus + 0
+   0059 36 00         [10]  144 	ld	(hl), #0x00
+                            145 ;IOLib.c:42: }
+   005B C9            [10]  146 	ret
+                            147 ;IOLib.c:45: void IOFrame(void)
+                            148 ;	---------------------------------
+                            149 ; Function IOFrame
+                            150 ; ---------------------------------
+   005C                     151 _IOFrame::
+   005C DD E5         [15]  152 	push	ix
+   005E DD 21 00 00   [14]  153 	ld	ix,#0
+   0062 DD 39         [15]  154 	add	ix,sp
+   0064 F5            [11]  155 	push	af
+   0065 F5            [11]  156 	push	af
+                            157 ;IOLib.c:50: if(IOStatus == IO_PLAYING)
+   0066 3Ar00r00      [13]  158 	ld	a,(#_IOStatus + 0)
+   0069 3D            [ 4]  159 	dec	a
+   006A C2r4Er01      [10]  160 	jp	NZ,00114$
+                            161 ;IOLib.c:80: frame++;
+   006D ED 4Br09r00   [20]  162 	ld	bc, (_IOFrame_frame_65536_12)
+   0071 03            [ 6]  163 	inc	bc
+                            164 ;IOLib.c:52: if(frame == 0)
+   0072 FD 21r09r00   [14]  165 	ld	iy, #_IOFrame_frame_65536_12
+   0076 FD 7E 01      [19]  166 	ld	a, 1 (iy)
+   0079 FD B6 00      [19]  167 	or	a, 0 (iy)
+   007C C2r31r01      [10]  168 	jp	NZ, 00107$
+                            169 ;IOLib.c:55: for(int i=7;i>=0;i--)
+   007F DD 36 FE 07   [19]  170 	ld	-2 (ix), #0x07
+   0083 AF            [ 4]  171 	xor	a, a
+   0084 DD 77 FF      [19]  172 	ld	-1 (ix), a
+   0087                     173 00112$:
+   0087 DD CB FF 7E   [20]  174 	bit	7, -1 (ix)
+   008B 20 69         [12]  175 	jr	NZ,00101$
+                            176 ;IOLib.c:58: byte |= (((*IOPointer)>>i) & 1)<<2;
+   008D 2Ar03r00      [16]  177 	ld	hl, (_IOPointer)
+   0090 5E            [ 7]  178 	ld	e, (hl)
+   0091 DD 7E FE      [19]  179 	ld	a, -2 (ix)
+   0094 3C            [ 4]  180 	inc	a
+   0095 18 02         [12]  181 	jr	00150$
+   0097                     182 00149$:
+   0097 CB 3B         [ 8]  183 	srl	e
+   0099                     184 00150$:
+   0099 3D            [ 4]  185 	dec	a
+   009A 20 FB         [12]  186 	jr	NZ, 00149$
+   009C 7B            [ 4]  187 	ld	a, e
+   009D E6 01         [ 7]  188 	and	a, #0x01
+   009F 6F            [ 4]  189 	ld	l, a
+   00A0 26 00         [ 7]  190 	ld	h, #0x00
+   00A2 29            [11]  191 	add	hl, hl
+   00A3 29            [11]  192 	add	hl, hl
+   00A4 EB            [ 4]  193 	ex	de,hl
+                            194 ;IOLib.c:59: IOPointer++;
+   00A5 2Ar03r00      [16]  195 	ld	hl, (_IOPointer)
+   00A8 23            [ 6]  196 	inc	hl
+   00A9 22r03r00      [16]  197 	ld	(_IOPointer), hl
+                            198 ;IOLib.c:60: byte |= (((*IOPointer)>>i) & 1)<<3;
+   00AC 2Ar03r00      [16]  199 	ld	hl, (_IOPointer)
+   00AF 6E            [ 7]  200 	ld	l, (hl)
+   00B0 DD 7E FE      [19]  201 	ld	a, -2 (ix)
+   00B3 3C            [ 4]  202 	inc	a
+   00B4 18 02         [12]  203 	jr	00152$
+   00B6                     204 00151$:
+   00B6 CB 3D         [ 8]  205 	srl	l
+   00B8                     206 00152$:
+   00B8 3D            [ 4]  207 	dec	a
+   00B9 20 FB         [12]  208 	jr	NZ, 00151$
+   00BB 7D            [ 4]  209 	ld	a, l
+   00BC E6 01         [ 7]  210 	and	a, #0x01
+   00BE 6F            [ 4]  211 	ld	l, a
+   00BF 26 00         [ 7]  212 	ld	h, #0x00
+   00C1 29            [11]  213 	add	hl, hl
+   00C2 29            [11]  214 	add	hl, hl
+   00C3 29            [11]  215 	add	hl, hl
+   00C4 7B            [ 4]  216 	ld	a, e
+   00C5 B5            [ 4]  217 	or	a, l
+   00C6 5F            [ 4]  218 	ld	e, a
+   00C7 7A            [ 4]  219 	ld	a, d
+   00C8 B4            [ 4]  220 	or	a, h
+                            221 ;IOLib.c:61: IOPointer--;
+   00C9 2Ar03r00      [16]  222 	ld	hl, (_IOPointer)
+   00CC 2B            [ 6]  223 	dec	hl
+   00CD 22r03r00      [16]  224 	ld	(_IOPointer), hl
+                            225 ;IOLib.c:62: G2G_IOPinPort = byte;
+   00D0 7B            [ 4]  226 	ld	a, e
+   00D1 D3 01         [11]  227 	out	(_G2G_IOPinPort), a
+                            228 ;IOLib.c:63: byte |= 1;
+   00D3 CB C3         [ 8]  229 	set	0, e
+                            230 ;IOLib.c:64: G2G_IOPinPort = byte;
+   00D5 7B            [ 4]  231 	ld	a, e
+   00D6 D3 01         [11]  232 	out	(_G2G_IOPinPort), a
+                            233 ;IOLib.c:65: byte &= 0xFE;
+   00D8 7B            [ 4]  234 	ld	a, e
+   00D9 E6 FE         [ 7]  235 	and	a, #0xfe
+   00DB DD 77 FC      [19]  236 	ld	-4 (ix), a
+   00DE DD 36 FD 00   [19]  237 	ld	-3 (ix), #0x00
+                            238 ;IOLib.c:66: G2G_IOPinPort = byte;
+   00E2 DD 7E FC      [19]  239 	ld	a, -4 (ix)
+   00E5 D3 01         [11]  240 	out	(_G2G_IOPinPort), a
+                            241 ;IOLib.c:55: for(int i=7;i>=0;i--)
+   00E7 DD 6E FE      [19]  242 	ld	l, -2 (ix)
+   00EA DD 66 FF      [19]  243 	ld	h, -1 (ix)
+   00ED 2B            [ 6]  244 	dec	hl
+   00EE DD 75 FE      [19]  245 	ld	-2 (ix), l
+   00F1 DD 74 FF      [19]  246 	ld	-1 (ix), h
+   00F4 18 91         [12]  247 	jr	00112$
+   00F6                     248 00101$:
+                            249 ;IOLib.c:68: byte |= 1 << 1;
+   00F6 DD 5E FC      [19]  250 	ld	e, -4 (ix)
+   00F9 CB CB         [ 8]  251 	set	1, e
+                            252 ;IOLib.c:69: G2G_IOPinPort = byte;
+   00FB 7B            [ 4]  253 	ld	a, e
+   00FC D3 01         [11]  254 	out	(_G2G_IOPinPort), a
+                            255 ;IOLib.c:71: G2G_IOPinPort = byte;
+   00FE 3E 00         [ 7]  256 	ld	a, #0x00
+   0100 D3 01         [11]  257 	out	(_G2G_IOPinPort), a
+                            258 ;IOLib.c:73: IOPointer+=2;
+   0102 2Ar03r00      [16]  259 	ld	hl, (_IOPointer)
+   0105 23            [ 6]  260 	inc	hl
+   0106 23            [ 6]  261 	inc	hl
+   0107 22r03r00      [16]  262 	ld	(_IOPointer), hl
+                            263 ;IOLib.c:74: count+=2;
+   010A 2Ar07r00      [16]  264 	ld	hl, (_IOFrame_count_65536_12)
+   010D 23            [ 6]  265 	inc	hl
+   010E 23            [ 6]  266 	inc	hl
+   010F 22r07r00      [16]  267 	ld	(_IOFrame_count_65536_12), hl
+                            268 ;IOLib.c:75: if(count >= IOSize)
+   0112 ED 5Br07r00   [20]  269 	ld	de, (_IOFrame_count_65536_12)
+   0116 21r05r00      [10]  270 	ld	hl, #_IOSize
+   0119 7B            [ 4]  271 	ld	a, e
+   011A 96            [ 7]  272 	sub	a, (hl)
+   011B 7A            [ 4]  273 	ld	a, d
+   011C 23            [ 6]  274 	inc	hl
+   011D 9E            [ 7]  275 	sbc	a, (hl)
+   011E 38 0B         [12]  276 	jr	C,00103$
+                            277 ;IOLib.c:77: IOStatus = IO_STOPPED;
+   0120 21r00r00      [10]  278 	ld	hl,#_IOStatus + 0
+   0123 36 00         [10]  279 	ld	(hl), #0x00
+                            280 ;IOLib.c:78: count = 0;
+   0125 21 00 00      [10]  281 	ld	hl, #0x0000
+   0128 22r07r00      [16]  282 	ld	(_IOFrame_count_65536_12), hl
+   012B                     283 00103$:
+                            284 ;IOLib.c:80: frame++;
+   012B ED 43r09r00   [20]  285 	ld	(_IOFrame_frame_65536_12), bc
+   012F 18 1D         [12]  286 	jr	00114$
+   0131                     287 00107$:
+                            288 ;IOLib.c:84: frame++;
+   0131 ED 43r09r00   [20]  289 	ld	(_IOFrame_frame_65536_12), bc
+                            290 ;IOLib.c:85: if(frame >= 3)
+   0135 FD 21r09r00   [14]  291 	ld	iy, #_IOFrame_frame_65536_12
+   0139 FD 7E 00      [19]  292 	ld	a, 0 (iy)
+   013C D6 03         [ 7]  293 	sub	a, #0x03
+   013E FD 7E 01      [19]  294 	ld	a, 1 (iy)
+   0141 17            [ 4]  295 	rla
+   0142 3F            [ 4]  296 	ccf
+   0143 1F            [ 4]  297 	rra
+   0144 DE 80         [ 7]  298 	sbc	a, #0x80
+   0146 38 06         [12]  299 	jr	C,00114$
+                            300 ;IOLib.c:86: frame = 0;
+   0148 21 00 00      [10]  301 	ld	hl, #0x0000
+   014B 22r09r00      [16]  302 	ld	(_IOFrame_frame_65536_12), hl
+   014E                     303 00114$:
+                            304 ;IOLib.c:89: }
+   014E DD F9         [10]  305 	ld	sp, ix
+   0150 DD E1         [14]  306 	pop	ix
+   0152 C9            [10]  307 	ret
+                            308 	.area _CODE
+                            309 	.area _INITIALIZER
+                            310 	.area _CABS (ABS)

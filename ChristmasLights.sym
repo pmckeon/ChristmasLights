@@ -1,0 +1,77 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+    _A_Very_Sega_Master_System_Christmas_Events_bin                **** GX
+    _A_Very_Sega_Master_System_Christmas_psg                       **** GX
+    _CarolSpirits_Events_bin                                       **** GX
+    _CarolSpirits_psg                                              **** GX
+    _G2G_IOPinPort                                              =  0001 
+    _G2G_NMIPort                                                =  0002 
+    _G2G_RxPort                                                 =  0004 
+    _G2G_StatusPort                                             =  0005 
+    _G2G_TxPort                                                 =  0003 
+    _GG_loadBGPalette                                              **** GX
+    _IOFrame                                                       **** GX
+    _IOPlay                                                        **** GX
+    _IOStop                                                        **** GX
+    _PSGFrame                                                      **** GX
+    _PSGGetStatus                                                  **** GX
+    _PSGPlayNoRepeat                                               **** GX
+    _PSGStop                                                       **** GX
+  2 _PlayList                                                      0002 GR
+  2 _PlayListIndex                                                 001D GR
+    _ROM_bank_to_be_mapped_on_slot2                             =  FFFF G
+    _SMS_SRAM                                                   =  8000 G
+    _SMS_VDPturnOnFeature                                          **** GX
+    _SMS_VRAMmemcpy                                                **** GX
+    _SMS_crt0_RST08                                                **** GX
+    _SMS_crt0_RST18                                                **** GX
+    _SMS_getKeysPressed                                            **** GX
+    _SMS_loadTileMapArea                                           **** GX
+    _SMS_waitForVBlank                                             **** GX
+    _SRAM_bank_to_be_mapped_on_slot2                            =  FFFC G
+    _Yule__palette__bin                                            **** GX
+    _Yule__tilemap__bin                                            **** GX
+    _Yule__tiles__bin                                              **** GX
+  A ___SMS__SDSC_author                                            3FD1 GR
+  C ___SMS__SDSC_descr                                             3FBF GR
+  B ___SMS__SDSC_name                                              3FC0 GR
+  D ___SMS__SDSC_signature                                         3FE0 GR
+  9 ___SMS__SEGA_signature                                         3FF0 GR
+  0 __str_0                                                        01E4 R
+  0 __str_1                                                        01F3 R
+  0 __str_2                                                        0204 R
+  7 __xinit__PlayList                                              0002 R
+  7 __xinit__PlayListIndex                                         001D R
+  7 __xinit__framecount                                            0000 R
+    _fire__tiles__bin                                              **** GX
+  2 _framecount                                                    0000 GR
+  0 _main                                                          003A GR
+  0 _putstring                                                     0000 GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180 / ZX-Next / eZ80), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  205   flags    0
+   1 _DATA                                      size    0   flags    0
+   2 _INITIALIZED                               size   1F   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size   1F   flags    0
+   8 _CABS                                      size    0   flags    8
+   9 _CABS0                                     size   10   flags    8
+   A _CABS1                                     size    F   flags    8
+   B _CABS2                                     size   11   flags    8
+   C _CABS3                                     size    1   flags    8
+   D _CABS4                                     size   10   flags    8
+
